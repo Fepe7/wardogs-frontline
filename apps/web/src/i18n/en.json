@@ -63,7 +63,15 @@
     "matchesCounted": "{{count}} matches counted",
     "simulatedMatchesCounted": "{{count}} simulated matches counted",
     "closing": "Closing",
-    "closingLabel": "Time is up: the result is being counted"
+    "closingLabel": "Time is up: the result is being counted",
+    "lastMatch": "Last match counted · {{time}}",
+    "lastMatchSimulated": "Last simulated match · {{time}}",
+    "pointsEarned": "+{{points}} points",
+    "places": {
+      "first": "1st place",
+      "second": "2nd place",
+      "third": "3rd place"
+    }
   },
   "about": {
     "title": "About Wardogs Frontline",

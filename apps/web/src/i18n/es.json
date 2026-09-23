@@ -63,7 +63,15 @@
     "matchesCounted": "{{count}} partidas contadas",
     "simulatedMatchesCounted": "{{count}} partidas simuladas contadas",
     "closing": "Cerrando",
-    "closingLabel": "Tiempo agotado: se está contando el resultado"
+    "closingLabel": "Tiempo agotado: se está contando el resultado",
+    "lastMatch": "Última partida contada · {{time}}",
+    "lastMatchSimulated": "Última partida simulada · {{time}}",
+    "pointsEarned": "+{{points}} puntos",
+    "places": {
+      "first": "1.º puesto",
+      "second": "2.º puesto",
+      "third": "3.er puesto"
+    }
   },
   "about": {
     "title": "Sobre Wardogs Frontline",

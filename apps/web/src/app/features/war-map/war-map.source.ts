@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import type { DocumentSnapshot, Query, QuerySnapshot } from 'firebase/firestore';
-import type { OpenBattle, Sector } from '@frontline/core';
+import type { OpenBattle, RecentMatch, Sector } from '@frontline/core';
 import { defer, EMPTY, Observable, switchMap } from 'rxjs';
 import {
   FirebaseClient,
@@ -38,6 +38,14 @@ export class WarMapSource {
     return this.watchDocument(['demo', 'clock'], (snapshot, next) => {
       const offset: unknown = snapshot.get('offsetMs');
       next(typeof offset === 'number' ? offset : 0);
+    });
+  }
+
+  /** The latest matches the war has counted, newest first (one public document). */
+  watchRecentMatches(): Observable<readonly RecentMatch[]> {
+    return this.watchDocument(['war', 'recentMatches'], (snapshot, next) => {
+      const data = fromFirestoreData(snapshot.data()) as { matches: RecentMatch[] } | undefined;
+      next(data?.matches ?? []);
     });
   }
 

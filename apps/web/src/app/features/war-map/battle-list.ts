@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import type { OpenBattle, SectorId } from '@frontline/core';
+import type { OpenBattle, RecentMatch, SectorId } from '@frontline/core';
 import { FactionSwatch } from './faction-swatch';
 import { FlapText } from './flap-text';
 
@@ -20,7 +20,7 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
 /**
  * The dispatch board: one row per battle in progress, with the sector on flap tiles,
  * both sides and their points, the time left and how many matches the points come from.
- * Changed points and times flip, so every counted match is seen landing on the board.
+ * Changed points and times flip, and the rows the latest match scored in light up.
  */
 @Component({
   selector: 'app-battle-list',
@@ -36,12 +36,14 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
         @for (battle of battles(); track battle.id) {
           @let left = timeLeft(battle.endsAt, warNowMs());
           <li class="relative border-t border-grid py-3">
-            <!-- A new element each time a match is counted: the row lights up amber, once. -->
-            @for (counted of [battle.scoredReportIds.length]; track counted) {
-              <span
-                aria-hidden="true"
-                class="row-flash pointer-events-none absolute inset-0"
-              ></span>
+            <!-- One element per latest match that scored here: the row lights up amber, once. -->
+            @if (flashKey(battle); as key) {
+              @for (flash of [key]; track flash) {
+                <span
+                  aria-hidden="true"
+                  class="row-flash pointer-events-none absolute inset-0"
+                ></span>
+              }
             }
             <app-flap-text
               class="relative text-[1.2rem] text-chalk"
@@ -129,9 +131,16 @@ export class BattleList {
   readonly warNowMs = input.required<number>();
   /** Demo: the points come from simulated matches, and the board says so. */
   readonly simulated = input(false);
+  /** The latest counted match: the rows it scored in light up. */
+  readonly latestMatch = input<RecentMatch | null>(null);
 
   protected readonly timeLeft = timeLeft;
   protected readonly format = twoDigits;
+
+  protected flashKey(battle: OpenBattle): string | null {
+    const latest = this.latestMatch();
+    return latest?.battleIds.includes(battle.id) ? latest.matchId : null;
+  }
 
   protected sides(battle: OpenBattle) {
     return [

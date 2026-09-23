@@ -12,6 +12,7 @@ export * from './war/domain/battle';
 export * from './war/domain/hex-coord';
 export * from './war/domain/initial-map';
 export * from './war/domain/match-points';
+export * from './war/domain/recent-matches';
 export * from './war/domain/vote-round';
 export * from './war/domain/war-map';
 export type * from './war/application/ports';

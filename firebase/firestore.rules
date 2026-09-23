@@ -32,6 +32,11 @@ service cloud.firestore {
       allow get: if true;
     }
 
+    // The latest counted matches (placements only, no player data), for the board.
+    match /war/recentMatches {
+      allow get: if true;
+    }
+
     // Demo only: offset of the demo clock, so the web can show real times.
     match /demo/clock {
       allow get: if true;

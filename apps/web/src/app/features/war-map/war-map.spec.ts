@@ -5,12 +5,14 @@ import {
   initialWarMap,
   type BattleId,
   type OpenBattle,
+  type RecentMatch,
   type Sector,
 } from '@frontline/core';
 import { Subject } from 'rxjs';
 import en from '../../../i18n/en.json';
 import { WarMap } from './war-map';
 import { WarMapSource } from './war-map.source';
+import { WarMapStore } from './war-map.store';
 
 const map = initialWarMap();
 // A Lonestar sector on the Valkyra border, so Valkyra can really attack it.
@@ -46,6 +48,7 @@ const render = async () => {
   const mapUpdates = new Subject<readonly Sector[] | null>();
   const battleUpdates = new Subject<readonly OpenBattle[]>();
   const demoOffsets = new Subject<number>();
+  const recentUpdates = new Subject<readonly RecentMatch[]>();
   await TestBed.configureTestingModule({
     imports: [
       WarMap,
@@ -56,12 +59,14 @@ const render = async () => {
       }),
     ],
     providers: [
+      WarMapStore,
       {
         provide: WarMapSource,
         useValue: {
           watchMap: () => mapUpdates,
           watchOpenBattles: () => battleUpdates,
           watchDemoOffset: () => demoOffsets,
+          watchRecentMatches: () => recentUpdates,
         },
       },
     ],
@@ -83,7 +88,11 @@ const render = async () => {
     demoOffsets.next(offsetMs);
     await fixture.whenStable();
   };
-  return { page, push, fail, skipDemo };
+  const countMatch = async (match: RecentMatch) => {
+    recentUpdates.next([match]);
+    await fixture.whenStable();
+  };
+  return { page, push, fail, skipDemo, countMatch };
 };
 
 describe('the war map', () => {
@@ -139,6 +148,23 @@ describe('the war map', () => {
     await push(map, [{ ...battle, endsAt: new Date('2020-01-01T00:00:00Z') }]);
 
     expect(spoken(page.querySelector('ul li div p:last-child'))).toBe(en.warMap.closingLabel);
+  });
+
+  it('lights up only the battle rows the latest match scored in', async () => {
+    const { page, push, countMatch } = await render();
+    const latest = (battleIds: string[]): RecentMatch => ({
+      matchId: 'match-1',
+      placements: { first: 'valkyra', second: 'lonestar', third: 'manticore' },
+      playedAt: new Date('2026-10-01T19:00:00Z'),
+      battleIds: battleIds as BattleId[],
+    });
+
+    await push(map, [battle]);
+    await countMatch(latest(['another-battle']));
+    expect(page.querySelectorAll('.row-flash')).toHaveLength(0);
+
+    await countMatch(latest([battle.id]));
+    expect(page.querySelectorAll('.row-flash')).toHaveLength(1);
   });
 
   it('says how many matches the points of a battle come from', async () => {

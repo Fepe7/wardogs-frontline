@@ -86,12 +86,19 @@ describe('fast-forwarding the demo war', () => {
     }
   });
 
-  it('resolves the battles once their 3 hours have passed', async () => {
-    let resolved = 0;
-    for (let hour = 0; hour < 4; hour += 1) resolved += (await press()).resolvedBattles;
+  // Four presses replay 24 steps of war against the emulator: longer than the default 5 s.
+  const FOUR_HOURS_TIMEOUT_MS = 20_000;
 
-    expect(resolved).toBeGreaterThan(0);
-  });
+  it(
+    'resolves the battles once their 3 hours have passed',
+    async () => {
+      let resolved = 0;
+      for (let hour = 0; hour < 4; hour += 1) resolved += (await press()).resolvedBattles;
+
+      expect(resolved).toBeGreaterThan(0);
+    },
+    FOUR_HOURS_TIMEOUT_MS,
+  );
 
   it('only works in the demo', async () => {
     expect(await call(false)).toBe('demo-only');

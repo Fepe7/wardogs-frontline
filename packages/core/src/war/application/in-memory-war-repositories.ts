@@ -1,7 +1,13 @@
 import type { Battle, BattleId, OpenBattle } from '../domain/battle';
+import type { RecentMatch } from '../domain/recent-matches';
 import type { OpenVoteRound, VoteRound, VoteRoundId } from '../domain/vote-round';
 import type { Sector } from '../domain/war-map';
-import type { BattleRepository, VoteRoundRepository, WarMapRepository } from './ports';
+import type {
+  BattleRepository,
+  RecentMatchesRepository,
+  VoteRoundRepository,
+  WarMapRepository,
+} from './ports';
 
 /** In-memory adapters for use case tests. */
 
@@ -53,5 +59,18 @@ export class InMemoryBattleRepository implements BattleRepository {
 
   all(): Battle[] {
     return [...this.battles.values()];
+  }
+}
+
+export class InMemoryRecentMatchesRepository implements RecentMatchesRepository {
+  current: readonly RecentMatch[] = [];
+
+  load(): Promise<readonly RecentMatch[]> {
+    return Promise.resolve(this.current);
+  }
+
+  save(matches: readonly RecentMatch[]): Promise<void> {
+    this.current = matches;
+    return Promise.resolve();
   }
 }

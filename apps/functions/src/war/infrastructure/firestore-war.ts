@@ -4,6 +4,8 @@ import type {
   BattleRepository,
   OpenBattle,
   OpenVoteRound,
+  RecentMatch,
+  RecentMatchesRepository,
   Sector,
   VoteRound,
   VoteRoundRepository,
@@ -14,6 +16,7 @@ import { fromDocument, toDocument } from '../../shared/infrastructure/document-m
 import { COLLECTIONS } from '../../shared/infrastructure/firestore-transaction';
 
 const MAP_DOCUMENT = 'map';
+const RECENT_MATCHES_DOCUMENT = 'recentMatches';
 
 /** The whole map lives in one document, so loading it costs a single read. */
 class FirestoreWarMapRepository implements WarMapRepository {
@@ -83,10 +86,35 @@ class FirestoreBattleRepository implements BattleRepository {
   }
 }
 
+/** The latest counted matches in one public document: the board reads it in one go. */
+class FirestoreRecentMatchesRepository implements RecentMatchesRepository {
+  constructor(
+    private readonly db: Firestore,
+    private readonly transaction: Transaction,
+  ) {}
+
+  async load(): Promise<readonly RecentMatch[]> {
+    const snapshot = await this.transaction.get(this.document());
+    return snapshot.exists
+      ? (fromDocument(snapshot.data()) as { matches: RecentMatch[] }).matches
+      : [];
+  }
+
+  save(matches: readonly RecentMatch[]): Promise<void> {
+    this.transaction.set(this.document(), toDocument({ matches }));
+    return Promise.resolve();
+  }
+
+  private document() {
+    return this.db.collection(COLLECTIONS.war).doc(RECENT_MATCHES_DOCUMENT);
+  }
+}
+
 export const warContext =
   (db: Firestore) =>
   (transaction: Transaction): WarTransactionContext => ({
     map: new FirestoreWarMapRepository(db, transaction),
     rounds: new FirestoreVoteRoundRepository(db, transaction),
     battles: new FirestoreBattleRepository(db, transaction),
+    recentMatches: new FirestoreRecentMatchesRepository(db, transaction),
   });

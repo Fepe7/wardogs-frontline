@@ -7,6 +7,7 @@ import type { PlayerId } from '../../shared/domain/player-id';
 import type { Sector, SectorId } from '../domain/war-map';
 import {
   InMemoryBattleRepository,
+  InMemoryRecentMatchesRepository,
   InMemoryVoteRoundRepository,
   InMemoryWarMapRepository,
 } from './in-memory-war-repositories';
@@ -52,6 +53,7 @@ const player = (id: string) => id as PlayerId;
 let map: InMemoryWarMapRepository;
 let rounds: InMemoryVoteRoundRepository;
 let battles: InMemoryBattleRepository;
+let recentMatches: InMemoryRecentMatchesRepository;
 let now: Date;
 let deps: Parameters<typeof advanceWar>[0];
 
@@ -59,10 +61,11 @@ beforeEach(async () => {
   map = new InMemoryWarMapRepository();
   rounds = new InMemoryVoteRoundRepository();
   battles = new InMemoryBattleRepository();
+  recentMatches = new InMemoryRecentMatchesRepository();
   now = start;
   const clock: Clock = { now: () => now };
   deps = {
-    transaction: inMemoryTransaction({ map, rounds, battles }),
+    transaction: inMemoryTransaction({ map, rounds, battles, recentMatches }),
     clock,
     ids: sequentialIds('war'),
   };
@@ -239,6 +242,28 @@ describe('scoreApprovedMatch', () => {
 
     expect((await battles.findOpen())[0]?.points).toEqual({ attacker: 0, defender: 0 });
   });
+
+  it('remembers the match and the battles it scored in, so the board can show it', async () => {
+    await scoreApprovedMatch(deps)(approved('report-1', valkyraWins, 30));
+
+    const [battle] = await battles.findOpen();
+    expect(recentMatches.current).toEqual([
+      { matchId: 'report-1', placements: valkyraWins, playedAt: at(30), battleIds: [battle?.id] },
+    ]);
+  });
+
+  it('does not list a match that counted in no battle', async () => {
+    await scoreApprovedMatch(deps)(approved('report-1', valkyraWins, 10));
+
+    expect(recentMatches.current).toEqual([]);
+  });
+
+  it('lists a match once when the event is delivered again', async () => {
+    await scoreApprovedMatch(deps)(approved('report-1', valkyraWins, 30));
+    await scoreApprovedMatch(deps)(approved('report-1', valkyraWins, 30));
+
+    expect(recentMatches.current).toHaveLength(1);
+  });
 });
 
 describe('advanceWar', () => {
@@ -357,6 +382,7 @@ describe('the pace of the war', () => {
         map: new InMemoryWarMapRepository(),
         rounds: demoRounds,
         battles: demoBattles,
+        recentMatches: new InMemoryRecentMatchesRepository(),
       }),
       pace: GAME_CONFIG.pace.demo,
     };

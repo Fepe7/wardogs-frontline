@@ -12,6 +12,8 @@ export const GAME_CONFIG = {
     /** Demo in dev only: whole cycles within an afternoon. */
     demo: { voteRoundHours: 1, battleHours: 3 },
   },
+  /** How many of the latest counted matches the board can show (war/recentMatches). */
+  recentMatchesKept: 5,
   /** Minimum days between two faction changes. */
   allegianceChangeCooldownDays: 7,
 } as const;

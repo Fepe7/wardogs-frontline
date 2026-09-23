@@ -166,6 +166,11 @@ describe('war on Firestore', () => {
     await scoreApprovedMatch(warDeps())(match);
     await scoreApprovedMatch(warDeps())(match); // redelivered event: must not count twice
 
+    const recent = await db.collection(COLLECTIONS.war).doc('recentMatches').get();
+    expect(recent.get('matches')).toMatchObject([
+      { matchId: 'report-1', placements: match.placements, battleIds: [expect.any(String)] },
+    ]);
+
     now = at(72);
     expect((await advanceWar(warDeps())()).resolvedBattles).toBe(1);
 

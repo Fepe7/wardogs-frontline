@@ -17,7 +17,10 @@ const STANDING_BASE_REM = 0.9;
 const STANDING_REM_PER_SHARE = 2.4;
 const TWO_TILES = 2;
 
-/** The live war as a dispatch board: map, standings, battles and, in the demo, the lever. */
+/**
+ * The live war as a dispatch board: map, standings, battles and, in the demo, the lever.
+ * The page provides the WarMapStore, so the board header can share the same state.
+ */
 @Component({
   selector: 'app-war-map',
   imports: [
@@ -29,7 +32,6 @@ const TWO_TILES = 2;
     FlapText,
     HexMap,
   ],
-  providers: [WarMapStore],
   template: `
     <app-faction-patterns />
     <h2 id="front-title" class="sr-only">{{ 'warMap.title' | transloco }}</h2>
@@ -87,6 +89,7 @@ const TWO_TILES = 2;
                 [sectorNames]="store.sectorNames()"
                 [warNowMs]="warNowMs()"
                 [simulated]="demoMode"
+                [latestMatch]="store.latestMatch()"
               />
             </section>
             @if (demoMode) {

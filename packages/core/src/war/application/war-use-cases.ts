@@ -20,6 +20,7 @@ import {
   type VoteError,
   type VoteRoundId,
 } from '../domain/vote-round';
+import { rememberMatch } from '../domain/recent-matches';
 import type { Sector, SectorId } from '../domain/war-map';
 import type { WarTransactionContext } from './ports';
 
@@ -93,16 +94,30 @@ export const withdrawVoteOnAllegianceChange =
       if (round) await rounds.save(withdrawVote(round, event.playerId));
     });
 
-/** Reacts to MatchApproved: adds the match to every open battle it was played in. */
+/**
+ * Reacts to MatchApproved: adds the match to every open battle it was played in, and
+ * remembers it among the recent matches the board shows (only if it counted somewhere).
+ */
 export const scoreApprovedMatch =
   ({ transaction }: Pick<WarDeps, 'transaction'>) =>
   (event: MatchApproved): Promise<void> =>
-    transaction.run(async ({ battles }) => {
-      for (const battle of await battles.findOpen()) {
-        const scored = scoreMatch(battle, event);
-        // Idempotent: a report already counted leaves the battle unchanged.
-        if (scored.ok && scored.value !== battle) await battles.save(scored.value);
-      }
+    transaction.run(async ({ battles, recentMatches }) => {
+      // Firestore transactions read everything before writing anything.
+      const [openBattles, recent] = await Promise.all([battles.findOpen(), recentMatches.load()]);
+      // Idempotent: a report already counted leaves the battle unchanged, so it is skipped.
+      const scored = openBattles.flatMap((battle) => {
+        const result = scoreMatch(battle, event);
+        return result.ok && result.value !== battle ? [result.value] : [];
+      });
+      for (const battle of scored) await battles.save(battle);
+      if (scored.length === 0) return;
+      const remembered = rememberMatch(recent, {
+        matchId: event.reportId,
+        placements: event.placements,
+        playedAt: event.playedAt,
+        battleIds: scored.map((battle) => battle.id),
+      });
+      if (remembered !== recent) await recentMatches.save(remembered);
     });
 
 const byFactionOrder = (a: OpenVoteRound, b: OpenVoteRound): number =>
