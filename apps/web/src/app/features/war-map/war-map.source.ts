@@ -23,8 +23,32 @@ export class WarMapSource {
       onSnapshot(
         doc(db, 'war', 'map'),
         (snapshot) => {
+          // An empty answer from the local cache only means the server has not replied
+          // yet, not that the war has not started.
+          if (snapshot.metadata.fromCache && !snapshot.exists()) return;
           const data = fromFirestoreData(snapshot.data()) as { sectors: Sector[] } | undefined;
           subscriber.next(data?.sectors ?? null);
+        },
+        (error) => {
+          subscriber.error(error);
+        },
+      ),
+    );
+  }
+
+  /**
+   * Demo only: how far the demo clock runs ahead of real time (the fast-forward button
+   * moves it). War times minus this offset are real times.
+   */
+  watchDemoOffset(): Observable<number> {
+    const db = this.firebase.firestore();
+    if (!db) return EMPTY;
+    return new Observable((subscriber) =>
+      onSnapshot(
+        doc(db, 'demo', 'clock'),
+        (snapshot) => {
+          const offset: unknown = snapshot.get('offsetMs');
+          subscriber.next(typeof offset === 'number' ? offset : 0);
         },
         (error) => {
           subscriber.error(error);

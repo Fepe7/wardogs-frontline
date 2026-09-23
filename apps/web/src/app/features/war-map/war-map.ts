@@ -47,6 +47,7 @@ import { WarMapStore } from './war-map.store';
               <app-battle-list
                 [battles]="store.openBattles()"
                 [sectorNames]="store.sectorNames()"
+                [timeOffsetMs]="store.demoOffsetMs()"
               />
             </section>
           </div>

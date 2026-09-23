@@ -54,3 +54,13 @@ export interface SignInWithSteamResponse {
 export interface CallableErrorDetails {
   readonly reason: string;
 }
+
+/** Demo only: skip an hour of the war. No parameters. */
+export const fastForwardDemoRequest = z.strictObject({});
+export type FastForwardDemoRequest = z.infer<typeof fastForwardDemoRequest>;
+
+export interface FastForwardDemoResponse {
+  readonly resolvedBattles: number;
+  readonly closedRounds: number;
+  readonly matches: number;
+}

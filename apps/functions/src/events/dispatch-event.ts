@@ -57,3 +57,23 @@ export const dispatchEvent = async (
   }
   return { delivered };
 };
+
+const PENDING_BATCH = 100;
+
+/**
+ * Delivers the events no consumer has processed yet, for code paths where no trigger
+ * runs in time: the demo fast-forward and local seeding. Safe next to the trigger,
+ * because dispatchEvent skips what is already processed.
+ */
+export const dispatchPendingEvents = async (
+  db: Firestore,
+  consumers: EventConsumers,
+): Promise<number> => {
+  const pending = await db
+    .collection(COLLECTIONS.events)
+    .where('processedBy', '==', [])
+    .limit(PENDING_BATCH)
+    .get();
+  for (const event of pending.docs) await dispatchEvent(db, consumers, event.id);
+  return pending.size;
+};

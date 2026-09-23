@@ -24,6 +24,7 @@ const battle: OpenBattle = {
 const render = async () => {
   const mapUpdates = new Subject<readonly Sector[] | null>();
   const battleUpdates = new Subject<readonly OpenBattle[]>();
+  const demoOffsets = new Subject<number>();
   await TestBed.configureTestingModule({
     imports: [
       WarMap,
@@ -36,7 +37,11 @@ const render = async () => {
     providers: [
       {
         provide: WarMapSource,
-        useValue: { watchMap: () => mapUpdates, watchOpenBattles: () => battleUpdates },
+        useValue: {
+          watchMap: () => mapUpdates,
+          watchOpenBattles: () => battleUpdates,
+          watchDemoOffset: () => demoOffsets,
+        },
       },
     ],
   }).compileComponents();
@@ -53,7 +58,11 @@ const render = async () => {
     mapUpdates.error(new Error('permission-denied'));
     await fixture.whenStable();
   };
-  return { page, push, fail };
+  const skipDemo = async (offsetMs: number) => {
+    demoOffsets.next(offsetMs);
+    await fixture.whenStable();
+  };
+  return { page, push, fail, skipDemo };
 };
 
 describe('the war map', () => {
@@ -90,6 +99,19 @@ describe('the war map', () => {
       ['Valkyra attacking', '12'],
       ['Lonestar defending', '9'],
     ]);
+  });
+
+  it('shows when battles end in real time, even when the demo clock runs ahead', async () => {
+    const { page, push, skipDemo } = await render();
+    const HOUR_MS = 60 * 60 * 1000;
+    const endsAt = (text: string | undefined) => text?.match(/Ends (.*)/)?.[1];
+
+    await push(map, [battle]);
+    const before = endsAt(page.querySelector('ul')?.textContent);
+    await skipDemo(HOUR_MS);
+    await push(map, [{ ...battle, endsAt: new Date(battle.endsAt.getTime() + HOUR_MS) }]);
+
+    expect(endsAt(page.querySelector('ul')?.textContent)).toBe(before);
   });
 
   it('describes the map for screen readers', async () => {

@@ -6,8 +6,8 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { defineBoolean, defineSecret, defineString } from 'firebase-functions/params';
-import { GAME_CONFIG } from '@frontline/core';
-import { createCallables } from './callables';
+import { GAME_CONFIG, type Clock, type WarPace } from '@frontline/core';
+import { createCallables, RATE_LIMITS } from './callables';
 import { composeUseCases, type UseCases } from './composition';
 import { dispatchEvent } from './events/dispatch-event';
 import { signInWithSteam as signInWithSteamHandler } from './identity/handlers/sign-in-with-steam';
@@ -16,6 +16,11 @@ import { steamOpenIdVerifier } from './identity/infrastructure/steam-openid';
 import { steamWebApiProfiles } from './identity/infrastructure/steam-profiles';
 import { firestoreRateLimiter } from './shared/infrastructure/firestore-rate-limiter';
 import { systemClock } from './shared/infrastructure/firestore-transaction';
+import { readDemoOffset, shiftedClock } from './simulation/demo-clock';
+import {
+  fastForwardDemo as fastForwardDemoRun,
+  fastForwardDemoCallable,
+} from './simulation/fast-forward';
 import { simulateWar } from './simulation/simulate-war';
 
 // Every function runs in the same region as Firestore (docs/adr/0002).
@@ -31,38 +36,52 @@ const demoMode = defineBoolean('DEMO_MODE', { default: false });
 interface Services {
   readonly useCases: UseCases;
   readonly callables: ReturnType<typeof createCallables>;
+  readonly clock: Clock;
 }
-let services: Services | undefined;
+let standardServices: Services | undefined;
 
-/**
- * Wired on first use, not at module load: param values only exist at runtime, and the
- * deploy loads this module without them.
- */
-const app = (): Services => {
-  if (services) return services;
-  const pace = demoMode.value() ? GAME_CONFIG.pace.demo : GAME_CONFIG.pace.standard;
-  const useCases = composeUseCases(db, systemClock, pace);
-  services = {
-    useCases,
-    callables: createCallables(db, useCases, firestoreRateLimiter(db, systemClock)),
-  };
-  return services;
+/** Rate limits always count real time, even in the demo. */
+const rateLimiter = firestoreRateLimiter(db, systemClock);
+
+const compose = (clock: Clock, pace: WarPace): Services => {
+  const useCases = composeUseCases(db, clock, pace);
+  return { useCases, callables: createCallables(db, useCases, rateLimiter), clock };
 };
 
-/** Callables used by the web app. App Check rejects calls that do not come from it. */
-const callableOptions = { enforceAppCheck: true };
-export const swearAllegiance = onCall(callableOptions, (request) =>
-  app().callables.swearAllegiance(request),
+/**
+ * Wired on use, not at module load: param values only exist at runtime, and the deploy
+ * loads this module without them. The demo is wired on every call, because it runs on
+ * its own clock (real time plus an offset the fast-forward button moves ahead).
+ */
+const app = async (): Promise<Services> => {
+  if (!demoMode.value()) {
+    standardServices ??= compose(systemClock, GAME_CONFIG.pace.standard);
+    return standardServices;
+  }
+  const offset = await readDemoOffset(db);
+  return compose(shiftedClock(systemClock, offset), GAME_CONFIG.pace.demo);
+};
+
+/**
+ * Callables used by the web app. App Check rejects calls that do not come from it.
+ * Only the emulator skips it (it cannot attest a local `demo-*` app); FUNCTIONS_EMULATOR
+ * is never set in production.
+ */
+const callableOptions = { enforceAppCheck: process.env['FUNCTIONS_EMULATOR'] !== 'true' };
+export const swearAllegiance = onCall(callableOptions, async (request) =>
+  (await app()).callables.swearAllegiance(request),
 );
-export const castVote = onCall(callableOptions, (request) => app().callables.castVote(request));
-export const submitReport = onCall(callableOptions, (request) =>
-  app().callables.submitReport(request),
+export const castVote = onCall(callableOptions, async (request) =>
+  (await app()).callables.castVote(request),
 );
-export const approveReport = onCall(callableOptions, (request) =>
-  app().callables.approveReport(request),
+export const submitReport = onCall(callableOptions, async (request) =>
+  (await app()).callables.submitReport(request),
 );
-export const rejectReport = onCall(callableOptions, (request) =>
-  app().callables.rejectReport(request),
+export const approveReport = onCall(callableOptions, async (request) =>
+  (await app()).callables.approveReport(request),
+);
+export const rejectReport = onCall(callableOptions, async (request) =>
+  (await app()).callables.rejectReport(request),
 );
 
 /** Steam Web API key (Secret Manager), used to read the player's public name. */
@@ -80,7 +99,7 @@ export const signInWithSteam = onCall({ ...callableOptions, secrets: [steamApiKe
     }),
     nonces: firestoreSteamNonces(db, systemClock),
     profiles: steamWebApiProfiles({ apiKey: steamApiKey.value() }),
-    signInPlayer: app().useCases.signInPlayer,
+    signInPlayer: (command) => app().then(({ useCases }) => useCases.signInPlayer(command)),
     createToken: (uid) => getAuth().createCustomToken(uid),
   })(request),
 );
@@ -92,7 +111,7 @@ export const signInWithSteam = onCall({ ...callableOptions, secrets: [steamApiKe
 export const onIntegrationEvent = onDocumentCreated(
   { document: 'events/{eventId}', retry: true },
   async (event) => {
-    const { delivered } = await dispatchEvent(db, app().useCases, event.params.eventId);
+    const { delivered } = await dispatchEvent(db, (await app()).useCases, event.params.eventId);
     logger.info('Integration event dispatched', { eventId: event.params.eventId, delivered });
   },
 );
@@ -101,7 +120,7 @@ export const onIntegrationEvent = onDocumentCreated(
 export const advanceWarJob = onSchedule(
   { schedule: 'every 5 minutes', timeZone: 'Europe/Madrid' },
   async () => {
-    const summary = await app().useCases.advanceWar();
+    const summary = await (await app()).useCases.advanceWar();
     logger.info('War advanced', summary);
   },
 );
@@ -111,8 +130,23 @@ export const simulateWarJob = onSchedule(
   { schedule: 'every 10 minutes', timeZone: 'Europe/Madrid' },
   async () => {
     if (!demoMode.value()) return;
-    const { useCases } = app();
-    const summary = await simulateWar({ ...useCases, clock: systemClock, random: Math.random })();
+    const { useCases, clock } = await app();
+    const summary = await simulateWar({ ...useCases, clock, random: Math.random })();
     logger.info('War simulated', summary);
   },
+);
+
+/** Demo button: skips an hour of the war for everyone watching. Rejected outside the demo. */
+export const fastForwardDemo = onCall(callableOptions, (request) =>
+  fastForwardDemoCallable({
+    demoMode: demoMode.value(),
+    rateLimiter,
+    rateLimit: RATE_LIMITS.fastForwardDemo,
+    run: fastForwardDemoRun({
+      db,
+      clock: systemClock,
+      pace: GAME_CONFIG.pace.demo,
+      random: Math.random,
+    }),
+  })(request),
 );

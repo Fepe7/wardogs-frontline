@@ -32,6 +32,11 @@ service cloud.firestore {
       allow get: if true;
     }
 
+    // Demo only: offset of the demo clock, so the web can show real times.
+    match /demo/clock {
+      allow get: if true;
+    }
+
     match /battles/{battleId} {
       allow get: if true;
       allow list: if limitedTo(50);

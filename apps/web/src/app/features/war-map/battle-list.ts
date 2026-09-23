@@ -42,7 +42,9 @@ import { FactionSwatch } from './faction-swatch';
               </tbody>
             </table>
             <p class="mt-1 text-sm text-chalk-muted">
-              {{ 'warMap.endsAt' | transloco: { time: (battle.endsAt | date: 'd/M HH:mm') } }}
+              {{
+                'warMap.endsAt' | transloco: { time: (realTime(battle.endsAt) | date: 'd/M HH:mm') }
+              }}
             </p>
           </li>
         }
@@ -53,6 +55,12 @@ import { FactionSwatch } from './faction-swatch';
 export class BattleList {
   readonly battles = input.required<readonly OpenBattle[]>();
   readonly sectorNames = input.required<ReadonlyMap<SectorId, string>>();
+  /** How far war time runs ahead of real time (only in the demo). */
+  readonly timeOffsetMs = input(0);
+
+  protected realTime(warTime: Date): Date {
+    return new Date(warTime.getTime() - this.timeOffsetMs());
+  }
 
   protected sides(battle: OpenBattle) {
     return [

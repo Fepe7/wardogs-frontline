@@ -4,7 +4,12 @@
     "home": "Wardogs Frontline, home"
   },
   "demo": {
-    "notice": "Demo: the war runs on simulated players and matches until real match results are connected."
+    "notice": "Demo: the war runs on simulated players and matches until real match results are connected.",
+    "fastForward": "Skip 1 hour",
+    "fastForwarding": "Skipping an hour…",
+    "fastForwarded": "One hour later: {{matches}} matches played, {{closedRounds}} votes closed and {{resolvedBattles}} battles over.",
+    "rate-limited": "The demo has been skipped ahead a lot this hour. Try again later.",
+    "failed": "The war could not be skipped ahead. Try again in a moment."
   },
   "footer": {
     "disclaimer": "Wardogs Frontline is a fan-made community project, not affiliated with or endorsed by Bulkhead or Team17. WARDOGS is a trademark of its respective owners.",

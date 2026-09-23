@@ -17,6 +17,7 @@ export const COLLECTIONS = {
   battles: 'battles',
   rateLimits: 'rateLimits',
   steamNonces: 'steamNonces',
+  demo: 'demo',
 } as const;
 
 /**

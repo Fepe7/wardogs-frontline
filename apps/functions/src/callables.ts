@@ -15,9 +15,13 @@ import type { RateLimiter, RateLimitRule } from './shared/infrastructure/firesto
 const HOUR_MS = 60 * 60 * 1000;
 
 /** Anti-abuse limits per player (docs/DISEÑO.md §5). */
-export const RATE_LIMITS: Readonly<Record<'submitReport' | 'castVote', RateLimitRule>> = {
+export const RATE_LIMITS: Readonly<
+  Record<'submitReport' | 'castVote' | 'fastForwardDemo', RateLimitRule>
+> = {
   submitReport: { action: 'submitReport', max: 10, windowMs: 24 * HOUR_MS },
   castVote: { action: 'castVote', max: 30, windowMs: HOUR_MS },
+  /** Global, not per player: anyone watching the demo can press the button. */
+  fastForwardDemo: { action: 'fastForwardDemo', max: 20, windowMs: HOUR_MS },
 };
 
 /** Screenshots must live in the caller's own folder; storage.rules will enforce the same path when uploads open. */

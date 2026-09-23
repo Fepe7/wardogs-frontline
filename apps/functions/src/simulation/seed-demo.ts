@@ -2,8 +2,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { GAME_CONFIG, type Clock } from '@frontline/core';
 import { composeUseCases } from '../composition';
-import { dispatchEvent } from '../events/dispatch-event';
-import { COLLECTIONS } from '../shared/infrastructure/firestore-transaction';
+import { dispatchPendingEvents } from '../events/dispatch-event';
 import { simulateWar } from './simulate-war';
 
 /**
@@ -43,8 +42,7 @@ for (let minutes = 65; minutes <= 90; minutes += 5) {
 }
 
 // No trigger runs here unless the Functions emulator is up; dispatching is idempotent.
-const events = await db.collection(COLLECTIONS.events).get();
-for (const event of events.docs) await dispatchEvent(db, useCases, event.id);
+await dispatchPendingEvents(db, useCases);
 
 const { openBattles } = await useCases.readWar();
 console.log(`Demo war seeded: ${String(openBattles.length)} battles in progress.`);

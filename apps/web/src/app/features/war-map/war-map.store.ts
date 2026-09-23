@@ -2,6 +2,7 @@ import { computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { patchState, signalStore, withComputed, withHooks, withState } from '@ngrx/signals';
 import { FACTIONS, type OpenBattle, type Sector, type SectorId } from '@frontline/core';
+import { environment } from '../../../environments/environment';
 import { WarMapSource } from './war-map.source';
 
 type WarMapStatus = 'loading' | 'ready' | 'not-started' | 'error';
@@ -10,9 +11,16 @@ interface WarMapState {
   readonly status: WarMapStatus;
   readonly sectors: readonly Sector[];
   readonly openBattles: readonly OpenBattle[];
+  /** Demo only: the demo clock runs this far ahead of real time. */
+  readonly demoOffsetMs: number;
 }
 
-const initialState: WarMapState = { status: 'loading', sectors: [], openBattles: [] };
+const initialState: WarMapState = {
+  status: 'loading',
+  sectors: [],
+  openBattles: [],
+  demoOffsetMs: 0,
+};
 
 /** State of the war map feature: the live map and the battles in progress. */
 export const WarMapStore = signalStore(
@@ -34,6 +42,14 @@ export const WarMapStore = signalStore(
   })),
   withHooks({
     onInit(store, source = inject(WarMapSource)) {
+      if (environment.demoMode) {
+        source
+          .watchDemoOffset()
+          .pipe(takeUntilDestroyed())
+          .subscribe((demoOffsetMs) => {
+            patchState(store, { demoOffsetMs });
+          });
+      }
       const failed = () => {
         patchState(store, { status: 'error' });
       };

@@ -38,6 +38,7 @@ beforeAll(async () => {
     const db = context.firestore();
     const seed: Record<string, object> = {
       'war/map': { sectors: [] },
+      'demo/clock': { offsetMs: 3600000 },
       'battles/b1': { status: 'open', attacker: 'valkyra', defender: 'lonestar' },
       'voteRounds/valkyra-1': { status: 'open', faction: 'valkyra', votes: [] },
       'voteRounds/lonestar-1': { status: 'open', faction: 'lonestar', votes: [] },
@@ -68,6 +69,12 @@ describe('the war is public', () => {
     await assertSucceeds(getDocs(query(battles, where('status', '==', 'open'), limit(10))));
     await assertFails(getDocs(query(battles, where('status', '==', 'open'))));
     await assertFails(getDocs(query(battles, limit(51))));
+  });
+});
+
+describe('the demo clock', () => {
+  it('is public, so the web can show real times while the demo runs ahead', async () => {
+    await assertSucceeds(getDoc(doc(anonymous(), 'demo/clock')));
   });
 });
 
@@ -153,6 +160,7 @@ describe('server-only data', () => {
 describe('clients never write', () => {
   it.each([
     'war/map',
+    'demo/clock',
     'battles/b1',
     'voteRounds/valkyra-1',
     `players/${ANA}`,

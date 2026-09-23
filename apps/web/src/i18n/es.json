@@ -4,7 +4,12 @@
     "home": "Wardogs Frontline, inicio"
   },
   "demo": {
-    "notice": "Demo: la guerra funciona con jugadores y partidas simulados hasta que se conecten resultados reales."
+    "notice": "Demo: la guerra funciona con jugadores y partidas simulados hasta que se conecten resultados reales.",
+    "fastForward": "Avanzar 1 hora",
+    "fastForwarding": "Avanzando una hora…",
+    "fastForwarded": "Una hora después: {{matches}} partidas jugadas, {{closedRounds}} votaciones cerradas y {{resolvedBattles}} batallas terminadas.",
+    "rate-limited": "La demo ya se ha adelantado mucho en esta hora. Vuelve a intentarlo más tarde.",
+    "failed": "No se ha podido adelantar la guerra. Vuelve a intentarlo en un momento."
   },
   "footer": {
     "disclaimer": "Wardogs Frontline es un proyecto de la comunidad hecho por fans, sin relación con Bulkhead ni Team17 y sin su respaldo. WARDOGS es una marca de sus respectivos propietarios.",
