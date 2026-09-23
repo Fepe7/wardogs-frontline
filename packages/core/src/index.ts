@@ -1,6 +1,7 @@
 // Shared kernel
 export type { Brand } from './shared/domain/brand';
 export * from './shared/domain/faction';
+export type { MatchApproved } from './shared/domain/integration-events';
 export type { PlayerId } from './shared/domain/player-id';
 export * from './shared/domain/result';
 export { GAME_CONFIG } from './config/game';
@@ -11,3 +12,6 @@ export * from './war/domain/hex-coord';
 export * from './war/domain/match-points';
 export * from './war/domain/vote-round';
 export * from './war/domain/war-map';
+
+// Matches context
+export * from './matches/domain/match-report';
