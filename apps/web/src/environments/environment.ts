@@ -15,6 +15,11 @@ export interface Environment {
   } | null;
   /** Same region as the functions (docs/adr/0002). */
   readonly functionsRegion: string;
+  /**
+   * Public origin of the site, e.g. https://frontline.example. Link previews need
+   * absolute URLs; null until the site has its address (it is set when deploying).
+   */
+  readonly siteUrl: string | null;
 }
 
 export const environment: Environment = {
@@ -23,4 +28,5 @@ export const environment: Environment = {
   firebase: { projectId: 'demo-frontline', apiKey: 'demo-api-key', appId: 'demo-frontline-web' },
   emulators: { host: '127.0.0.1', firestorePort: 8080, functionsPort: 5001 },
   functionsRegion: 'europe-west1',
+  siteUrl: null,
 };

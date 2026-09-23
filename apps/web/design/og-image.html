@@ -1,0 +1,116 @@
+<!doctype html>
+<!--
+  Source of public/og-image.png (1200x630), the preview shown when the site is shared.
+  Regenerate with headless Chrome (see apps/web/design/README.md).
+  Original art only: our mark and map, no WARDOGS assets.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,700..900&family=Public+Sans:wght@400;600&display=block"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        background: #0e0e0d
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M44 48h8M48 44v8' stroke='%23efe7d8' stroke-opacity='0.09' stroke-width='1.5'/%3E%3C/svg%3E");
+        color: #efe7d8;
+        font-family: 'Public Sans', sans-serif;
+        display: grid;
+        grid-template-columns: 1fr 470px;
+        align-items: center;
+        padding: 0 72px;
+        box-sizing: border-box;
+      }
+      .kicker {
+        display: inline-block;
+        background: #e8b33a;
+        color: #0e0e0d;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 6px 12px;
+      }
+      h1 {
+        font-family: 'Archivo', sans-serif;
+        font-stretch: 118%;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 76px;
+        line-height: 0.95;
+        margin: 26px 0 0;
+      }
+      p {
+        font-size: 28px;
+        line-height: 1.35;
+        color: #a8a298;
+        margin: 22px 0 0;
+        max-width: 560px;
+      }
+      small {
+        position: absolute;
+        left: 72px;
+        bottom: 36px;
+        font-size: 16px;
+        color: #a8a298;
+      }
+      svg {
+        width: 470px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <span class="kicker">Fan-made season war for WARDOGS</span>
+      <h1>Wardogs<br />Frontline</h1>
+      <p>Every match you play moves the front.</p>
+    </div>
+    <svg id="map" viewBox="-80 -75 160 150" aria-hidden="true"></svg>
+    <small>Not affiliated with or endorsed by Bulkhead or Team17.</small>
+    <script>
+      // Same geometry as the real initial map: radius 3 without the center, 3 wedges.
+      const colors = ['#3f8ad8', '#c8414b', '#7dbb5b'];
+      const dirs = [
+        [1, 0],
+        [1, -1],
+        [0, -1],
+        [-1, 0],
+        [-1, 1],
+        [0, 1],
+      ];
+      const size = 10;
+      const svg = document.getElementById('map');
+      for (let radius = 1; radius <= 3; radius++) {
+        let [q, r] = [dirs[4][0] * radius, dirs[4][1] * radius];
+        for (let side = 0; side < 6; side++) {
+          for (let step = 0; step < radius; step++) {
+            const cx = size * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
+            const cy = size * 1.5 * r;
+            const points = [...Array(6)]
+              .map((_, i) => {
+                const a = (Math.PI / 180) * (60 * i - 30);
+                return `${cx + size * Math.cos(a)},${cy + size * Math.sin(a)}`;
+              })
+              .join(' ');
+            const hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            hex.setAttribute('points', points);
+            hex.setAttribute('fill', colors[Math.floor(side / 2)]);
+            hex.setAttribute('stroke', '#0e0e0d');
+            hex.setAttribute('stroke-width', '1.2');
+            svg.appendChild(hex);
+            [q, r] = [q + dirs[side][0], r + dirs[side][1]];
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

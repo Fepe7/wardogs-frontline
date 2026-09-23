@@ -106,6 +106,25 @@
     "authorProfile": "GitHub",
     "authorCode": "Código fuente"
   },
+  "meta": {
+    "home": {
+      "title": "Wardogs Frontline: la guerra de temporada de WARDOGS",
+      "description": "Guerra de temporada hecha por fans para WARDOGS: cada partida real mueve el frente entre Lonestar, Valkyra y Manticore."
+    },
+    "about": {
+      "title": "Sobre el proyecto | Wardogs Frontline",
+      "description": "Cómo funciona la guerra, cómo se conectarían las partidas reales de WARDOGS y quién la ha hecho."
+    },
+    "notFound": {
+      "title": "Página no encontrada | Wardogs Frontline",
+      "description": "Esta página no existe. Vuelve al frente."
+    }
+  },
+  "notFound": {
+    "title": "Este sector no está en el mapa",
+    "text": "La página que buscas no existe o se ha movido.",
+    "back": "Volver al frente"
+  },
   "languages": {
     "en": "English",
     "es": "Español"

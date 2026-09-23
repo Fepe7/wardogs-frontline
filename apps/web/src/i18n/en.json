@@ -106,6 +106,25 @@
     "authorProfile": "GitHub",
     "authorCode": "Source code"
   },
+  "meta": {
+    "home": {
+      "title": "Wardogs Frontline: the season war for WARDOGS",
+      "description": "Fan-made season war for WARDOGS: every real match moves the front between Lonestar, Valkyra and Manticore."
+    },
+    "about": {
+      "title": "About | Wardogs Frontline",
+      "description": "How the war works, how real WARDOGS matches would plug in, and who built it."
+    },
+    "notFound": {
+      "title": "Page not found | Wardogs Frontline",
+      "description": "This page does not exist. Head back to the front."
+    }
+  },
+  "notFound": {
+    "title": "This sector is not on the map",
+    "text": "The page you are looking for does not exist or has moved.",
+    "back": "Back to the front"
+  },
   "languages": {
     "en": "English",
     "es": "Español"

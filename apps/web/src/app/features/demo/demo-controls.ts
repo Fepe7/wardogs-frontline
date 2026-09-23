@@ -1,5 +1,4 @@
 import { inject, Service } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import type {
   CallableErrorDetails,
   FastForwardDemoRequest,
@@ -20,10 +19,14 @@ export const failureOf = (error: unknown): FastForwardFailure => {
 export class DemoControls {
   private readonly firebase = inject(FirebaseClient);
 
-  /** Skips an hour of the shared demo war. */
+  /** Skips an hour of the shared demo war. The Functions SDK loads on the first press. */
   async fastForward(): Promise<FastForwardDemoResponse> {
-    const call = httpsCallable<FastForwardDemoRequest, FastForwardDemoResponse>(
+    const [functions, { httpsCallable }] = await Promise.all([
       this.firebase.functions(),
+      import('firebase/functions'),
+    ]);
+    const call = httpsCallable<FastForwardDemoRequest, FastForwardDemoResponse>(
+      functions,
       'fastForwardDemo',
     );
     return (await call({})).data;
