@@ -12,6 +12,18 @@ export const RESULT_MESSAGE_EXAMPLE = {
   placements: { first: 'valkyra', second: 'lonestar', third: 'manticore' },
 } as const;
 
+/**
+ * Example of what the war would send back at the end of a season, so WARDOGS can reward
+ * the winning faction's players by what they contributed (docs/DISEÑO.md §5). Only the
+ * winner and the matches that counted: Bulkhead already knows who played each one.
+ */
+export const SEASON_RESULT_EXAMPLE = {
+  seasonId: 'season-1',
+  endedAt: '2026-11-05T20:00:00Z',
+  winner: 'manticore',
+  countedMatchIds: ['7c9e6679-7425-40de-944b-e07fc1f90ae7', '1b4e28ba-2fa1-11d2-883f-0016d3cca427'],
+} as const;
+
 /** The project explained for Bulkhead: what it is, how the demo runs and what it would need. */
 @Component({
   selector: 'app-about-page',
@@ -52,6 +64,23 @@ export const RESULT_MESSAGE_EXAMPLE = {
         </ul>
       </section>
 
+      <section aria-labelledby="about-rewards" class="mt-12">
+        <h2 id="about-rewards" class="font-display text-3xl font-bold">
+          {{ 'about.rewardsTitle' | transloco }}
+        </h2>
+        <p class="mt-3">{{ 'about.rewardsText' | transloco }}</p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-chalk-muted">
+          @for (point of rewardPoints; track point) {
+            <li>{{ 'about.rewardsPoints.' + point | transloco }}</li>
+          }
+        </ul>
+        <p class="mt-4">{{ 'about.rewardsDataText' | transloco }}</p>
+        <pre
+          class="mt-4 overflow-x-auto rounded-sm border border-grid bg-table-raised p-4 text-sm"
+        ><code>{{ seasonResult }}</code></pre>
+        <p class="mt-4 text-chalk-muted">{{ 'about.rewardsFit' | transloco }}</p>
+      </section>
+
       <section aria-labelledby="about-source" class="mt-12">
         <h2 id="about-source" class="font-display text-3xl font-bold">
           {{ 'about.sourceTitle' | transloco }}
@@ -78,4 +107,6 @@ export class AboutPage {
   };
   protected readonly resultMessage = JSON.stringify(RESULT_MESSAGE_EXAMPLE, null, 2);
   protected readonly notes = ['privacy', 'signed', 'idempotent', 'pull'] as const;
+  protected readonly seasonResult = JSON.stringify(SEASON_RESULT_EXAMPLE, null, 2);
+  protected readonly rewardPoints = ['when', 'who', 'what', 'threshold'] as const;
 }

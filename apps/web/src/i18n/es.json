@@ -75,7 +75,17 @@
       "pull": "Un endpoint de solo lectura, como «partidas terminadas desde cierta hora», serviría igual."
     },
     "sourceTitle": "Código fuente",
-    "sourceText": "El proyecto es de código abierto:"
+    "sourceText": "El proyecto es de código abierto:",
+    "rewardsTitle": "Recompensas para la facción ganadora",
+    "rewardsText": "La guerra se convierte en un objetivo a largo plazo dentro de la economía de WARDOGS si los jugadores que la ganan reciben algo por ello. Al final de cada temporada gana la facción con más sectores, y sus jugadores reciben recompensas en proporción a lo que aportaron.",
+    "rewardsPoints": {
+      "when": "Cuándo: al final de cada temporada de WARDOGS, o cada pocas semanas como una campaña más corta si las temporadas son largas. La frecuencia la elegís vosotros.",
+      "who": "Quién: los jugadores que jugaron partidas con la facción ganadora que contaron en la guerra. Medís la aportación de cada uno con los datos que ya tenéis (partidas jugadas y, si queréis, el dinero ganado en ellas), así que cuentan el combate, el apoyo y la logística.",
+      "what": "Qué: recompensas que sobreviven al reinicio de temporada y no afectan al equilibrio, como lingotes de oro o un cosmético de victoria de la facción. Nunca equipo ni dinero que haga a nadie más fuerte.",
+      "threshold": "Un mínimo de partidas que cuenten, para que no compense cambiarse al bando ganador en el último momento."
+    },
+    "rewardsDataText": "Al final de la temporada, la guerra os enviaría la facción ganadora y los identificadores de las partidas que contaron para ella:",
+    "rewardsFit": "Ya sabéis quién jugó cada una de esas partidas y con qué facción, así que ningún dato de jugadores sale de vuestro lado. Encaja con la metajugabilidad de temporada más fuerte que planeáis para el acceso anticipado y premia el tiempo y el impacto que cada jugador aporta a una partida."
   },
   "languages": {
     "en": "English",

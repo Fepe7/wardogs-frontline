@@ -75,7 +75,17 @@
       "pull": "A read-only endpoint, such as “matches finished since a given time”, would work just as well."
     },
     "sourceTitle": "Source code",
-    "sourceText": "The project is open source:"
+    "sourceText": "The project is open source:",
+    "rewardsTitle": "Rewarding the winning faction",
+    "rewardsText": "The war becomes a long-term goal inside the WARDOGS economy if the players who win it get something for it. At the end of each season, the faction holding the most sectors wins, and its players are rewarded in proportion to what they contributed.",
+    "rewardsPoints": {
+      "when": "When: at the end of each WARDOGS season, or every few weeks as a shorter campaign if seasons are long. The cadence is yours to choose.",
+      "who": "Who: players who played matches for the winning faction that counted in the war. You measure each player’s contribution with the data you already have (matches played and, if you like, cash earned in them), so combat, support and logistics all count.",
+      "what": "What: rewards that survive the seasonal reset and do not affect balance, such as gold bars or a faction victory cosmetic. Never gear or cash that would make anyone stronger.",
+      "threshold": "A minimum number of counted matches, so switching to the winning side at the last minute is not worth it."
+    },
+    "rewardsDataText": "At the end of the season, the war would send you the winner and the ids of the matches that counted for it:",
+    "rewardsFit": "You already know who played each of those matches and for which faction, so no player data leaves your side. It builds on the stronger seasonal meta game you plan for Early Access, and it rewards the time and impact players bring to a match."
   },
   "languages": {
     "en": "English",

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { FACTIONS, GAME_CONFIG } from '@frontline/core';
 import en from '../../../i18n/en.json';
-import { AboutPage, RESULT_MESSAGE_EXAMPLE } from './about.page';
+import { AboutPage, RESULT_MESSAGE_EXAMPLE, SEASON_RESULT_EXAMPLE } from './about.page';
 
 const render = async () => {
   await TestBed.configureTestingModule({
@@ -32,6 +32,22 @@ describe('the about page', () => {
       'placements',
     ]);
     expect(new Set(Object.values(RESULT_MESSAGE_EXAMPLE.placements))).toEqual(new Set(FACTIONS));
+  });
+
+  it('shows the season result it would send back, with no player data in it', async () => {
+    const page = await render();
+
+    const shown = [...page.querySelectorAll('pre code')].map(
+      (c) => JSON.parse(c.textContent) as unknown,
+    );
+    expect(shown).toContainEqual(SEASON_RESULT_EXAMPLE);
+    expect(Object.keys(SEASON_RESULT_EXAMPLE).sort()).toEqual([
+      'countedMatchIds',
+      'endedAt',
+      'seasonId',
+      'winner',
+    ]);
+    expect(FACTIONS).toContain(SEASON_RESULT_EXAMPLE.winner);
   });
 
   it('explains the demo pace with the numbers the game really uses', async () => {
