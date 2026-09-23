@@ -32,6 +32,16 @@ const battle: OpenBattle = {
   scoredReportIds: [],
 };
 
+/** Text as screen readers get it: the flap tiles are decorative, their label is not. */
+const spoken = (element: Element | null | undefined): string | undefined => {
+  if (!element) return undefined;
+  const copy = element.cloneNode(true) as Element;
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((hidden) => {
+    hidden.remove();
+  });
+  return copy.textContent.replace(/\s+/g, ' ').trim();
+};
+
 const render = async () => {
   const mapUpdates = new Subject<readonly Sector[] | null>();
   const battleUpdates = new Subject<readonly OpenBattle[]>();
@@ -88,10 +98,8 @@ describe('the war map', () => {
 
     await push(map);
 
-    expect(page.querySelectorAll('svg[role="img"] g')).toHaveLength(36);
-    expect(page.querySelector('dl')?.textContent.replace(/\s+/g, ' ')).toContain(
-      'Lonestar 12 Valkyra 12 Manticore 12',
-    );
+    expect(page.querySelectorAll('svg[role="img"] g.tile')).toHaveLength(36);
+    expect(spoken(page.querySelector('dl'))).toBe('Lonestar 12 Valkyra 12 Manticore 12');
   });
 
   it('marks the sectors under attack and lists their battles with the score', async () => {
@@ -100,10 +108,9 @@ describe('the war map', () => {
     await push(map, [battle]);
 
     expect(page.querySelectorAll('.front-pulse')).toHaveLength(1);
-    const text = (element: Element | null) => element?.textContent.replace(/\s+/g, ' ').trim();
     const score = [...page.querySelectorAll('ul tr')].map((row) => [
-      text(row.querySelector('th')),
-      text(row.querySelector('td')),
+      spoken(row.querySelector('th')),
+      spoken(row.querySelector('td')),
     ]);
     expect(page.querySelector('ul')?.textContent).toContain(target.name);
     expect(score).toEqual([
@@ -112,17 +119,35 @@ describe('the war map', () => {
     ]);
   });
 
-  it('shows when battles end in real time, even when the demo clock runs ahead', async () => {
+  it('counts down the time left on the war clock, which the demo can skip ahead', async () => {
     const { page, push, skipDemo } = await render();
     const HOUR_MS = 60 * 60 * 1000;
-    const endsAt = (text: string | undefined) => text?.match(/Ends (.*)/)?.[1];
+    const hoursLeft = () =>
+      Number(/(\d+) h/.exec(spoken(page.querySelector('ul li div p:last-child')) ?? '')?.[1]);
 
     await push(map, [battle]);
-    const before = endsAt(page.querySelector('ul')?.textContent);
+    const before = hoursLeft();
     await skipDemo(HOUR_MS);
-    await push(map, [{ ...battle, endsAt: new Date(battle.endsAt.getTime() + HOUR_MS) }]);
 
-    expect(endsAt(page.querySelector('ul')?.textContent)).toBe(before);
+    expect(before).toBeGreaterThan(0);
+    expect(hoursLeft()).toBe(before - 1);
+  });
+
+  it('says a battle is closing, not 00:00, once its time is up but it is not resolved yet', async () => {
+    const { page, push } = await render();
+
+    await push(map, [{ ...battle, endsAt: new Date('2020-01-01T00:00:00Z') }]);
+
+    expect(spoken(page.querySelector('ul li div p:last-child'))).toBe(en.warMap.closingLabel);
+  });
+
+  it('says how many matches the points of a battle come from', async () => {
+    const { page, push } = await render();
+
+    await push(map, [{ ...battle, scoredReportIds: ['match-1', 'match-2'] }]);
+
+    // In the demo the board also says the matches are simulated.
+    expect(page.querySelector('ul')?.textContent).toMatch(/2 (simulated )?matches counted/);
   });
 
   it('shows who attacks each sector: an arrow in the attacker color and a tooltip', async () => {

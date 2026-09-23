@@ -16,17 +16,26 @@ type FastForwardState =
 @Component({
   selector: 'app-fast-forward-button',
   imports: [TranslocoPipe],
-  host: { class: 'flex flex-wrap items-center justify-center gap-x-3 gap-y-1' },
+  host: { class: 'flex flex-col gap-3' },
   template: `
     <button
       type="button"
       (click)="skip()"
       [disabled]="state().kind === 'running'"
-      class="bg-signal px-3 py-1 text-xs font-bold tracking-[0.15em] text-table uppercase hover:bg-chalk disabled:cursor-wait disabled:opacity-60"
+      class="lever group flex w-full items-center justify-between gap-4 bg-signal px-5 py-2 text-left font-display text-2xl font-black text-table disabled:cursor-wait"
     >
       {{ (state().kind === 'running' ? 'demo.fastForwarding' : 'demo.fastForward') | transloco }}
+      <!-- The lever: a knob in a slot, thrown down while the hour is being skipped. -->
+      <svg viewBox="0 0 28 44" aria-hidden="true" class="h-11 w-7 shrink-0">
+        <rect x="10" y="3" width="8" height="38" rx="4" class="fill-table/25" />
+        <rect x="12.5" y="6" width="3" height="32" rx="1.5" class="fill-table/70" />
+        <g class="lever-knob" [class.lever-knob--pulled]="state().kind === 'running'">
+          <rect x="3" y="4" width="22" height="9" rx="2" class="fill-table" />
+          <rect x="3" y="4" width="22" height="3" rx="1.5" class="fill-chalk/15" />
+        </g>
+      </svg>
     </button>
-    <p role="status" class="text-chalk-muted">
+    <p role="status" class="min-h-5 text-sm text-chalk-muted">
       @switch (state().kind) {
         @case ('done') {
           {{ 'demo.fastForwarded' | transloco: summary() }}
@@ -36,6 +45,27 @@ type FastForwardState =
         }
       }
     </p>
+  `,
+  styles: `
+    .lever {
+      transition:
+        transform 160ms var(--ease-out),
+        background-color 160ms ease;
+    }
+    .lever:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .lever:hover:not(:disabled) {
+        background-color: var(--color-chalk);
+      }
+    }
+    .lever-knob {
+      transition: transform 240ms var(--ease-out);
+    }
+    .lever-knob--pulled {
+      transform: translateY(26px);
+    }
   `,
 })
 export class FastForwardButton {

@@ -56,9 +56,14 @@
     "score": "Points of each side",
     "attacker": "attacking",
     "defender": "defending",
-    "endsAt": "Ends {{time}}",
     "attackTitle": "{{attacker}} attacks {{sector}}, held by {{defender}}",
-    "attackKey": "Attack in progress: the arrow comes from the attacking faction."
+    "attackKey": "Attack in progress: the arrow comes from the attacking faction.",
+    "left": "Left",
+    "timeLeft": "{{hours}} h {{minutes}} min left",
+    "matchesCounted": "{{count}} matches counted",
+    "simulatedMatchesCounted": "{{count}} simulated matches counted",
+    "closing": "Closing",
+    "closingLabel": "Time is up: the result is being counted"
   },
   "about": {
     "title": "About Wardogs Frontline",
@@ -66,7 +71,7 @@
     "whatTitle": "What it is",
     "whatText": "Players join Lonestar, Valkyra or Manticore and vote on which neighbouring sector their faction attacks next. The attack becomes a battle, and every real match played while it lasts adds points: {{first}} for first place, {{second}} for second and {{third}} for third. When the battle ends, the side with more points holds the sector. At the end of the season, the faction with the most sectors wins.",
     "demoTitle": "How this demo works",
-    "demoText": "There are no real results yet, so bots vote and a simulated match is played every 10 minutes. Here votes last {{demoVoteHours}} hour and battles {{demoBattleHours}} hours; in a real season they would last {{seasonVoteHours}} and {{seasonBattleHours}} hours. Use “Skip 1 hour” at the top of the page to watch the war move.",
+    "demoText": "There are no real results yet, so bots vote and a simulated match is played every 10 minutes. Here votes last {{demoVoteHours}} hour and battles {{demoBattleHours}} hours; in a real season they would last {{seasonVoteHours}} and {{seasonBattleHours}} hours. Pull “Skip 1 hour” on the front page to watch the war move.",
     "connectTitle": "Connecting real matches",
     "connectText": "For each finished match, the war only needs to know how the three factions placed. On your side, that is one webhook; everything else already runs. It would send one small message when a match ends:",
     "connectNotes": {

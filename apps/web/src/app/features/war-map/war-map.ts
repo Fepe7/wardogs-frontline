@@ -1,50 +1,52 @@
-import { Component, computed, inject } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { environment } from '../../../environments/environment';
+import { FastForwardButton } from '../demo/fast-forward-button';
 import { BattleList } from './battle-list';
 import { FactionPatterns } from './faction-patterns';
 import { FactionSwatch } from './faction-swatch';
+import { FlapText } from './flap-text';
 import { HexMap, type MapAttack } from './hex-map';
 import { WarMapStore } from './war-map.store';
 
-/** The live war: map, territory of each faction and battles in progress. */
+/** The board's clock ticks often enough to keep the minutes left exact. */
+const CLOCK_TICK_MS = 15_000;
+/** Standings are set in billing weight: the more sectors, the bigger the name. */
+const STANDING_BASE_REM = 0.9;
+const STANDING_REM_PER_SHARE = 2.4;
+const TWO_TILES = 2;
+
+/** The live war as a dispatch board: map, standings, battles and, in the demo, the lever. */
 @Component({
   selector: 'app-war-map',
-  imports: [TranslocoPipe, BattleList, FactionPatterns, FactionSwatch, HexMap],
+  imports: [
+    TranslocoPipe,
+    BattleList,
+    FactionPatterns,
+    FactionSwatch,
+    FastForwardButton,
+    FlapText,
+    HexMap,
+  ],
   providers: [WarMapStore],
   template: `
     <app-faction-patterns />
-    <h2 id="front-title" class="font-display text-3xl font-bold">
-      {{ 'warMap.title' | transloco }}
-    </h2>
+    <h2 id="front-title" class="sr-only">{{ 'warMap.title' | transloco }}</h2>
     @switch (store.status()) {
       @case ('ready') {
-        <div class="mt-6 grid gap-10 lg:grid-cols-[2fr_1fr]">
-          <app-hex-map
-            class="hud-frame block p-4 sm:p-6"
-            [sectors]="store.sectors()"
-            [attacks]="attacks()"
-            [label]="'warMap.mapLabel' | transloco"
-            [summary]="summary()"
-          />
-          <div class="space-y-10">
-            <section aria-labelledby="territory-title">
-              <h3 id="territory-title" class="font-display text-2xl font-bold">
-                {{ 'warMap.territory' | transloco }}
-              </h3>
-              <dl class="mt-4 space-y-2">
-                @for (entry of store.territory(); track entry.faction) {
-                  <div class="flex items-center gap-3">
-                    <app-faction-swatch [faction]="entry.faction" />
-                    <dt class="flex-1">{{ 'factions.' + entry.faction | transloco }}</dt>
-                    <dd class="font-semibold tabular-nums">
-                      {{ entry.sectors }}
-                    </dd>
-                  </div>
-                }
-              </dl>
+        <div class="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+          <div class="flex flex-col border-grid lg:border-r">
+            <div class="p-4 sm:px-8 sm:pt-6 sm:pb-4">
+              <app-hex-map
+                class="mx-auto block w-full max-w-[27rem]"
+                [sectors]="store.sectors()"
+                [attacks]="attacks()"
+                [label]="'warMap.mapLabel' | transloco"
+                [summary]="summary()"
+              />
               @if (store.openBattles().length > 0) {
-                <p class="mt-4 flex items-center gap-3 text-sm text-chalk-muted">
+                <p class="mt-3 flex items-center justify-center gap-3 text-sm text-chalk-muted">
                   <svg viewBox="0 0 20 10" aria-hidden="true" class="h-3 w-6 shrink-0">
                     <line x1="1" y1="5" x2="13" y2="5" class="stroke-chalk" stroke-width="2" />
                     <path d="M12,1 L19,5 L12,9 z" class="fill-chalk" />
@@ -52,25 +54,55 @@ import { WarMapStore } from './war-map.store';
                   {{ 'warMap.attackKey' | transloco }}
                 </p>
               }
+            </div>
+            <section
+              aria-labelledby="territory-title"
+              class="border-t border-grid px-4 py-4 sm:px-8 lg:border-b"
+            >
+              <h3 id="territory-title" class="font-display text-lg font-extrabold text-chalk-muted">
+                {{ 'warMap.territory' | transloco }}
+              </h3>
+              <dl class="mt-2 flex flex-wrap items-end gap-x-8 gap-y-3">
+                @for (entry of standings(); track entry.faction) {
+                  <div class="flex items-center gap-3">
+                    <dt
+                      class="flex items-center gap-2 font-display leading-none font-black"
+                      [style.font-size.rem]="entry.size"
+                    >
+                      <app-faction-swatch [faction]="entry.faction" class="size-[0.7em]" />
+                      {{ 'factions.' + entry.faction | transloco }}
+                    </dt>
+                    <dd>
+                      <app-flap-text class="text-lg" [text]="entry.tiles" />
+                    </dd>
+                  </div>
+                }
+              </dl>
             </section>
-            <section aria-live="polite">
+          </div>
+          <div class="flex flex-col border-t border-grid lg:border-t-0">
+            <section aria-live="polite" class="px-4 pt-5 sm:px-8">
               <app-battle-list
                 [battles]="store.openBattles()"
                 [sectorNames]="store.sectorNames()"
-                [timeOffsetMs]="store.demoOffsetMs()"
+                [warNowMs]="warNowMs()"
+                [simulated]="demoMode"
               />
             </section>
+            @if (demoMode) {
+              <app-fast-forward-button class="mt-auto border-t border-grid p-4 sm:px-8" />
+            }
           </div>
         </div>
       }
       @case ('not-started') {
-        <p class="mt-4 text-chalk-muted">{{ 'warMap.notStarted' | transloco }}</p>
+        <p class="p-8 text-chalk-muted">{{ 'warMap.notStarted' | transloco }}</p>
       }
       @case ('error') {
-        <p role="alert" class="mt-4">{{ 'warMap.error' | transloco }}</p>
+        <p role="alert" class="p-8">{{ 'warMap.error' | transloco }}</p>
       }
       @default {
-        <p class="mt-4 text-chalk-muted">{{ 'warMap.loading' | transloco }}</p>
+        <p class="p-8 text-chalk-muted">{{ 'warMap.loading' | transloco }}</p>
       }
     }
   `,
@@ -79,6 +111,37 @@ export class WarMap {
   protected readonly store = inject(WarMapStore);
   private readonly transloco = inject(TranslocoService);
   private readonly language = toSignal(this.transloco.langChanges$);
+  protected readonly demoMode = environment.demoMode;
+
+  /** Real time, read in the browser only (the server render has no running clock). */
+  private readonly nowMs = signal(0);
+  /** Time on the war's clock: in the demo it runs ahead by the fast-forward offset. */
+  protected readonly warNowMs = computed(() => this.nowMs() + this.store.demoOffsetMs());
+
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      this.nowMs.set(Date.now());
+      const tick = setInterval(() => {
+        this.nowMs.set(Date.now());
+      }, CLOCK_TICK_MS);
+      destroyRef.onDestroy(() => {
+        clearInterval(tick);
+      });
+    });
+  }
+
+  /** Factions ranked by sectors held, each name sized by its share of the map. */
+  protected readonly standings = computed(() => {
+    const total = this.store.sectors().length || 1;
+    return [...this.store.territory()]
+      .sort((a, b) => b.sectors - a.sectors)
+      .map((entry) => ({
+        ...entry,
+        size: STANDING_BASE_REM + (entry.sectors / total) * STANDING_REM_PER_SHARE,
+        tiles: String(entry.sectors).padStart(TWO_TILES, '0'),
+      }));
+  });
 
   /** Each battle for the map, with a tooltip naming both sides in the active language. */
   protected readonly attacks = computed((): MapAttack[] => {

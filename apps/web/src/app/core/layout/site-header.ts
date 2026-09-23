@@ -9,12 +9,12 @@ import { FrontlineMark } from './frontline-mark';
   template: `
     <header class="border-b border-grid">
       <div
-        class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-6"
+        class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-6"
       >
         <a
           routerLink="/"
           [attr.aria-label]="'site.home' | transloco"
-          class="flex items-center gap-3 font-display text-2xl font-extrabold tracking-wide"
+          class="flex items-center gap-3 font-display text-[1.7rem] leading-none font-black"
         >
           <app-frontline-mark class="size-8" />
           {{ 'site.name' | transloco }}
@@ -28,7 +28,7 @@ import { FrontlineMark } from './frontline-mark';
                   routerLinkActive="text-signal! underline"
                   ariaCurrentWhenActive="page"
                   [routerLinkActiveOptions]="{ exact: true }"
-                  class="text-sm font-semibold tracking-[0.15em] text-chalk-muted uppercase underline-offset-8 hover:text-chalk"
+                  class="font-display text-lg font-extrabold text-chalk-muted underline-offset-8 hover:text-chalk"
                 >
                   {{ link.label | transloco }}
                 </a>

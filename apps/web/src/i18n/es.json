@@ -56,9 +56,14 @@
     "score": "Puntos de cada bando",
     "attacker": "ataca",
     "defender": "defiende",
-    "endsAt": "Termina el {{time}}",
     "attackTitle": "{{attacker}} ataca {{sector}}, de {{defender}}",
-    "attackKey": "Ataque en curso: la flecha sale de la facción que ataca."
+    "attackKey": "Ataque en curso: la flecha sale de la facción que ataca.",
+    "left": "Quedan",
+    "timeLeft": "Quedan {{hours}} h {{minutes}} min",
+    "matchesCounted": "{{count}} partidas contadas",
+    "simulatedMatchesCounted": "{{count}} partidas simuladas contadas",
+    "closing": "Cerrando",
+    "closingLabel": "Tiempo agotado: se está contando el resultado"
   },
   "about": {
     "title": "Sobre Wardogs Frontline",
@@ -66,7 +71,7 @@
     "whatTitle": "Qué es",
     "whatText": "Los jugadores se unen a Lonestar, Valkyra o Manticore y votan qué sector vecino ataca su facción. El ataque se convierte en una batalla, y cada partida real jugada mientras dura suma puntos: {{first}} por el primer puesto, {{second}} por el segundo y {{third}} por el tercero. Cuando termina la batalla, el bando con más puntos se queda el sector. Al final de la temporada gana la facción con más sectores.",
     "demoTitle": "Cómo funciona esta demo",
-    "demoText": "Todavía no hay resultados reales, así que votan bots y se juega una partida simulada cada 10 minutos. Aquí las votaciones duran {{demoVoteHours}} hora y las batallas {{demoBattleHours}} horas; en una temporada real durarían {{seasonVoteHours}} y {{seasonBattleHours}} horas. Usa «Avanzar 1 hora», arriba, para ver cómo se mueve la guerra.",
+    "demoText": "Todavía no hay resultados reales, así que votan bots y se juega una partida simulada cada 10 minutos. Aquí las votaciones duran {{demoVoteHours}} hora y las batallas {{demoBattleHours}} horas; en una temporada real durarían {{seasonVoteHours}} y {{seasonBattleHours}} horas. Usa «Avanzar 1 hora» en la portada para ver cómo se mueve la guerra.",
     "connectTitle": "Conectar partidas reales",
     "connectText": "De cada partida terminada, la guerra solo necesita saber en qué puesto quedó cada facción. Por vuestra parte es un webhook; todo lo demás ya funciona. Enviaría un mensaje pequeño al terminar cada partida:",
     "connectNotes": {

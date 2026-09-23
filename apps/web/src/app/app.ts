@@ -14,7 +14,7 @@ import { SiteHeader } from './core/layout/site-header';
       <app-demo-banner />
     }
     <app-site-header />
-    <main class="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">
+    <main class="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6">
       <router-outlet />
     </main>
     <app-site-footer />

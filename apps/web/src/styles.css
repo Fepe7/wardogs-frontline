@@ -1,47 +1,62 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens, in the visual language of WARDOGS and BULKHEAD (near-black, warm cream,
- * heavy uppercase headings, an amber accent, HUD details) without any of their assets:
- * no logos, art or fonts of theirs. The factions are the only other strong colors, and
- * they are for the map and large marks, not for body text.
+ * Design tokens: the war as a dispatch board in a mercenary operations room. A matte
+ * black board on a darker wall, gunmetal rules, flap tiles with off-white characters and
+ * one amber for what is live (the lever, open battles). No official WARDOGS, BULKHEAD or
+ * Team17 assets: own type, own marks.
  *
  * Faction colors follow the game: Lonestar blue, Valkyra red, Manticore green. No
- * official values are published, so these shades are our own, tuned for this background
- * (at least 3:1 contrast) and spread in lightness so red and green stay apart for
+ * official values are published, so these shades are our own, tuned for the board (at
+ * least 3:1 contrast) and spread in lightness so red and green stay apart for
  * color-blind players; each faction also has its own texture on the map.
  */
 @theme {
-  --color-table: #0e0e0d;
-  --color-table-raised: #191816;
-  --color-grid: #2b2a27;
-  --color-chalk: #efe7d8;
-  --color-chalk-muted: #a8a298;
-  /* Accent for the one thing to notice: the kicker and the demo action. */
-  --color-signal: #e8b33a;
+  /* The wall the board hangs on. */
+  --color-table: #0b0b0a;
+  /* The board itself. */
+  --color-table-raised: #151513;
+  /* Gunmetal rules and frames. */
+  --color-grid: #37362f;
+  --color-chalk: #f2efe6;
+  --color-chalk-muted: #aba697;
+  /* Amber for what is live: the lever, battles in progress, focus. */
+  --color-signal: #ffc21a;
   --color-lonestar: #3f8ad8;
   --color-valkyra: #c8414b;
   --color-manticore: #7dbb5b;
 
-  --font-display: 'Archivo', 'Arial Black', sans-serif;
+  /* One signage family in two widths: condensed for board labels, expanded for the header. */
+  --font-display: 'Anybody', 'Arial Narrow', sans-serif;
+  /* The flap tiles: a condensed mono with tabular figures and a flagged 1. */
+  --font-data: 'Martian Mono', ui-monospace, monospace;
   --font-sans: 'Public Sans', system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-color: var(--color-grid) var(--color-table);
+  }
+
   body {
     background-color: var(--color-table);
-    /* A faint grid of crosses, like a tactical plotting sheet. */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M44 48h8M48 44v8' stroke='%23efe7d8' stroke-opacity='0.07' stroke-width='1.5'/%3E%3C/svg%3E");
     color: var(--color-chalk);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Headings: wide, heavy and uppercase, as in the WARDOGS brand. */
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-table);
+  }
+
   .font-display {
-    font-stretch: 118%;
+    font-stretch: 72%;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
   }
 
   :focus-visible {
@@ -50,19 +65,18 @@
   }
 }
 
-/* HUD corner brackets around a panel, as on the BULKHEAD site. */
-@utility hud-frame {
-  --hud: var(--color-chalk-muted);
-  --arm: 16px;
-  background:
-    linear-gradient(var(--hud), var(--hud)) top left / var(--arm) 2px no-repeat,
-    linear-gradient(var(--hud), var(--hud)) top left / 2px var(--arm) no-repeat,
-    linear-gradient(var(--hud), var(--hud)) top right / var(--arm) 2px no-repeat,
-    linear-gradient(var(--hud), var(--hud)) top right / 2px var(--arm) no-repeat,
-    linear-gradient(var(--hud), var(--hud)) bottom left / var(--arm) 2px no-repeat,
-    linear-gradient(var(--hud), var(--hud)) bottom left / 2px var(--arm) no-repeat,
-    linear-gradient(var(--hud), var(--hud)) bottom right / var(--arm) 2px no-repeat,
-    linear-gradient(var(--hud), var(--hud)) bottom right / 2px var(--arm) no-repeat;
+/* The board header's register: the same family, expanded. */
+@utility font-wide {
+  font-stretch: 135%;
+  letter-spacing: -0.01em;
+}
+
+/* The board: a matte black panel in a gunmetal frame, with a dark inner rule. */
+@utility board {
+  background-color: var(--color-table-raised);
+  border: 6px solid var(--color-grid);
+  outline: 1px solid var(--color-table);
+  outline-offset: -7px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -70,6 +84,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }

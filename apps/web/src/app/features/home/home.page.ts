@@ -7,35 +7,39 @@ import { WarMap } from '../war-map/war-map';
   selector: 'app-home-page',
   imports: [TranslocoPipe, WarMap],
   template: `
-    <section class="py-12 sm:py-20">
-      <p
-        class="inline-block bg-signal px-2 py-1 text-xs font-bold tracking-[0.2em] text-table uppercase"
-      >
-        {{ 'home.kicker' | transloco }}
-      </p>
-      <h1
-        class="mt-5 max-w-4xl font-display text-4xl leading-[0.95] font-black text-balance sm:text-6xl"
-      >
-        {{ 'home.title' | transloco }}
-      </h1>
-      <p class="mt-6 max-w-prose text-lg text-chalk-muted">{{ 'home.lead' | transloco }}</p>
-    </section>
-
-    <section aria-labelledby="front-title" class="border-t border-grid py-12">
+    <section aria-labelledby="front-title" class="board mt-5 sm:mt-6">
+      <header class="border-b border-grid px-4 py-5 sm:px-8">
+        <h1
+          class="font-display font-wide text-[1.9rem] leading-[0.95] font-black text-balance sm:text-5xl lg:text-[2.75rem]"
+        >
+          {{ 'home.title' | transloco }}
+        </h1>
+        <div
+          class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-baseline lg:justify-between lg:gap-10"
+        >
+          <p class="max-w-[70ch] text-chalk-muted">{{ 'home.lead' | transloco }}</p>
+          <p
+            class="flex shrink-0 items-center gap-2 font-display text-lg font-extrabold text-signal"
+          >
+            <span aria-hidden="true" class="size-2 rounded-full bg-signal"></span>
+            {{ 'home.kicker' | transloco }}
+          </p>
+        </div>
+      </header>
       <app-war-map />
     </section>
 
-    <section aria-labelledby="how-title" class="border-t border-grid py-12">
-      <h2 id="how-title" class="font-display text-3xl font-bold">
+    <section aria-labelledby="how-title" class="py-14 sm:py-20">
+      <h2 id="how-title" class="font-display font-wide text-3xl font-black sm:text-4xl">
         {{ 'home.howTitle' | transloco }}
       </h2>
-      <ol class="mt-8 grid gap-8 sm:grid-cols-3">
+      <ol class="mt-8 grid gap-10 sm:grid-cols-3 sm:gap-8">
         @for (step of steps; track step) {
-          <li class="border-l-2 border-grid pl-4">
-            <h3 class="font-display text-xl font-bold">
+          <li class="border-t border-grid pt-5">
+            <h3 class="font-display text-2xl font-extrabold">
               {{ 'home.steps.' + step + '.title' | transloco }}
             </h3>
-            <p class="mt-2 max-w-prose text-chalk-muted">
+            <p class="mt-3 max-w-prose text-chalk-muted">
               {{ 'home.steps.' + step + '.text' | transloco: points }}
             </p>
           </li>
