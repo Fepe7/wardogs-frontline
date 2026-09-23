@@ -1,7 +1,10 @@
 {
   "site": {
     "name": "Wardogs Frontline",
-    "home": "Wardogs Frontline, home"
+    "home": "Wardogs Frontline, home",
+    "nav": "Main",
+    "front": "The front",
+    "about": "About"
   },
   "demo": {
     "notice": "Demo: the war runs on simulated players and matches until real match results are connected.",
@@ -55,6 +58,24 @@
     "endsAt": "Ends {{time}}",
     "attackTitle": "{{attacker}} attacks {{sector}}, held by {{defender}}",
     "attackKey": "Attack in progress: the arrow comes from the attacking faction."
+  },
+  "about": {
+    "title": "About Wardogs Frontline",
+    "lead": "A fan-made season war for WARDOGS: the matches people already play decide who holds each sector of a shared map.",
+    "whatTitle": "What it is",
+    "whatText": "Players join Lonestar, Valkyra or Manticore and vote on which neighbouring sector their faction attacks next. The attack becomes a battle, and every real match played while it lasts adds points: {{first}} for first place, {{second}} for second and {{third}} for third. When the battle ends, the side with more points holds the sector. At the end of the season, the faction with the most sectors wins.",
+    "demoTitle": "How this demo works",
+    "demoText": "There are no real results yet, so bots vote and a simulated match is played every 10 minutes. Here votes last {{demoVoteHours}} hour and battles {{demoBattleHours}} hours; in a real season they would last {{seasonVoteHours}} and {{seasonBattleHours}} hours. Use “Skip 1 hour” at the top of the page to watch the war move.",
+    "connectTitle": "Connecting real matches",
+    "connectText": "For each finished match, the war only needs to know how the three factions placed. The simplest way would be a webhook that sends one small message when a match ends:",
+    "connectNotes": {
+      "privacy": "No player data: only the match id, when it ended and the faction placements.",
+      "signed": "Signed with a shared secret, so only your servers can send results.",
+      "idempotent": "Each match id counts once, so retries are safe.",
+      "pull": "A read-only endpoint, such as “matches finished since a given time”, would work just as well."
+    },
+    "sourceTitle": "Source code",
+    "sourceText": "The project is open source:"
   },
   "languages": {
     "en": "English",
