@@ -8,4 +8,6 @@ export const GAME_CONFIG = {
   /** Provisional durations, pending final decision (docs/DISEÑO.md §6). */
   voteRoundDurationHours: 24,
   battleDurationHours: 48,
+  /** Minimum days between two faction changes. */
+  allegianceChangeCooldownDays: 7,
 } as const;

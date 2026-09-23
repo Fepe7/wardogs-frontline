@@ -104,3 +104,9 @@ export const tallyVotes = (
 
   return ok(winner ? { kind: 'attack', sectorId: winner.sectorId } : { kind: 'no-attack' });
 };
+
+/** Drops the vote of a player who left the faction while the round was open. */
+export const withdrawVote = (round: VoteRound, playerId: PlayerId): VoteRound => ({
+  ...round,
+  votes: round.votes.filter((vote) => vote.playerId !== playerId),
+});

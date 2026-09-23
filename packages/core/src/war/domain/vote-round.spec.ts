@@ -4,6 +4,7 @@ import {
   castVote,
   openVoteRound,
   tallyVotes,
+  withdrawVote,
   type VoteRound,
   type VoteRoundId,
 } from './vote-round';
@@ -104,6 +105,23 @@ describe('castVote', () => {
 
     expect(cast(-1)).toEqual({ ok: false, error: 'round-closed' });
     expect(cast(24)).toEqual({ ok: false, error: 'round-closed' });
+  });
+});
+
+describe('withdrawVote', () => {
+  it("removes the vote of a player who left the faction, keeping everyone else's", () => {
+    let round = vote(newRound(), 'ana', steelValley, 1);
+    round = vote(round, 'ben', lonestarHq, 2);
+
+    expect(withdrawVote(round, player('ana')).votes).toEqual([
+      { playerId: 'ben', sectorId: 'lonestar-hq', castAt: at(2) },
+    ]);
+  });
+
+  it('leaves the round unchanged when the player had not voted', () => {
+    const round = vote(newRound(), 'ben', lonestarHq, 2);
+
+    expect(withdrawVote(round, player('ana'))).toEqual(round);
   });
 });
 

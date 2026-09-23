@@ -1,7 +1,7 @@
 // Shared kernel
 export type { Brand } from './shared/domain/brand';
 export * from './shared/domain/faction';
-export type { MatchApproved } from './shared/domain/integration-events';
+export type { AllegianceChanged, MatchApproved } from './shared/domain/integration-events';
 export type { PlayerId } from './shared/domain/player-id';
 export * from './shared/domain/result';
 export { GAME_CONFIG } from './config/game';
@@ -15,3 +15,7 @@ export * from './war/domain/war-map';
 
 // Matches context
 export * from './matches/domain/match-report';
+
+// Identity context
+export * from './identity/domain/player';
+export * from './identity/domain/steam-id';
