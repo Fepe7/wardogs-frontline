@@ -1,3 +1,4 @@
+import { GAME_CONFIG, type WarPace } from '../../config/game';
 import type { Clock, IdGenerator, TransactionRunner } from '../../shared/application/ports';
 import { FACTIONS, type Faction } from '../../shared/domain/faction';
 import type { AllegianceChanged, MatchApproved } from '../../shared/domain/integration-events';
@@ -26,17 +27,28 @@ interface WarDeps {
   readonly transaction: TransactionRunner<WarTransactionContext>;
   readonly clock: Clock;
   readonly ids: IdGenerator;
+  /** Standard by default; the dev demo runs faster. */
+  readonly pace?: WarPace;
 }
 
 const sectorsUnderAttack = (battles: readonly OpenBattle[]): ReadonlySet<SectorId> =>
   new Set(battles.map((battle) => battle.sectorId));
 
-const newRound = (ids: IdGenerator, faction: Faction, opensAt: Date): OpenVoteRound =>
-  openVoteRound({ id: ids.next() as VoteRoundId, faction, opensAt });
+const newRound = (
+  { ids, pace = GAME_CONFIG.pace.standard }: Pick<WarDeps, 'ids' | 'pace'>,
+  faction: Faction,
+  opensAt: Date,
+): OpenVoteRound =>
+  openVoteRound({
+    id: ids.next() as VoteRoundId,
+    faction,
+    opensAt,
+    durationHours: pace.voteRoundHours,
+  });
 
 /** Stores the season map and opens the first vote round of every faction. */
 export const startWar =
-  ({ transaction, clock, ids }: WarDeps) =>
+  ({ transaction, clock, ...deps }: WarDeps) =>
   (command: {
     sectors: readonly Sector[];
   }): Promise<Result<void, 'war-already-started' | 'empty-map'>> =>
@@ -45,7 +57,7 @@ export const startWar =
       if (command.sectors.length === 0) return err('empty-map');
 
       await map.save(command.sectors);
-      for (const faction of FACTIONS) await rounds.save(newRound(ids, faction, clock.now()));
+      for (const faction of FACTIONS) await rounds.save(newRound(deps, faction, clock.now()));
       return ok(undefined);
     });
 
@@ -109,7 +121,7 @@ const withOwner = (sectors: readonly Sector[], sectorId: SectorId, owner: Factio
  * state is loaded up front and rounds opened during this run are tracked in memory.
  */
 export const advanceWar =
-  ({ transaction, clock, ids }: WarDeps) =>
+  ({ transaction, clock, ids, pace = GAME_CONFIG.pace.standard }: WarDeps) =>
   (): Promise<{ resolvedBattles: number; closedRounds: number }> =>
     transaction.run(async ({ map, rounds, battles }) => {
       const now = clock.now();
@@ -134,7 +146,7 @@ export const advanceWar =
         if (resolved.value.conquered) {
           sectors = withOwner(sectors, battle.sectorId, battle.attacker);
         }
-        const nextRound = newRound(ids, battle.attacker, battle.endsAt);
+        const nextRound = newRound({ ids, pace }, battle.attacker, battle.endsAt);
         await rounds.save(nextRound);
         roundsToClose.push(nextRound); // may already be due if the job ran very late
         resolvedBattles += 1;
@@ -160,6 +172,7 @@ export const advanceWar =
               sector: target,
               attacker: round.faction,
               startsAt: round.closesAt,
+              durationHours: pace.battleHours,
             })
           : undefined;
 
@@ -167,7 +180,7 @@ export const advanceWar =
           await battles.save(battle.value);
           activeBattles.push(battle.value);
         } else {
-          await rounds.save(newRound(ids, round.faction, round.closesAt));
+          await rounds.save(newRound({ ids, pace }, round.faction, round.closesAt));
         }
       }
 

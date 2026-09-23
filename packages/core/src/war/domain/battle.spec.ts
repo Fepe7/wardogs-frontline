@@ -86,6 +86,18 @@ describe('openBattle', () => {
 
     expect(result).toEqual({ ok: false, error: 'own-sector' });
   });
+
+  it('lasts as long as the pace of the war says', () => {
+    const result = openBattle({
+      id: 'battle-1' as BattleId,
+      sector: steelValley,
+      attacker: 'valkyra',
+      startsAt: start,
+      durationHours: 3,
+    });
+
+    expect(result.ok && result.value.endsAt).toEqual(at(3));
+  });
 });
 
 describe('scoreMatch', () => {

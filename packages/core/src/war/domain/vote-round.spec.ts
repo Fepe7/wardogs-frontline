@@ -67,6 +67,17 @@ describe('openVoteRound', () => {
       votes: [],
     });
   });
+
+  it('lasts as long as the pace of the war says', () => {
+    const round = openVoteRound({
+      id: 'round-1' as VoteRoundId,
+      faction: 'valkyra',
+      opensAt,
+      durationHours: 1,
+    });
+
+    expect(round.closesAt).toEqual(at(1));
+  });
 });
 
 describe('castVote', () => {

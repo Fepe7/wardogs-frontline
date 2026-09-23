@@ -1,5 +1,6 @@
 import type { Clock, IdGenerator, TransactionRunner } from '../../shared/application/ports';
-import type { FactionPlacements } from '../../shared/domain/faction';
+import type { FactionPlacements, PlacementsError } from '../../shared/domain/faction';
+import type { MatchApproved } from '../../shared/domain/integration-events';
 import type { PlayerId } from '../../shared/domain/player-id';
 import { err, ok, type Result } from '../../shared/domain/result';
 import {
@@ -12,6 +13,7 @@ import {
   type RejectedReport,
   type SubmitError,
 } from '../domain/match-report';
+import { verifyMatch } from '../domain/verified-match';
 import type { MatchesTransactionContext, MatchReportRepository } from './ports';
 
 interface MatchesDeps {
@@ -89,4 +91,24 @@ export const rejectMatchReport =
       });
       if (rejection.ok) await reports.save(rejection.value);
       return rejection;
+    });
+
+/**
+ * Records a match from a trusted automatic source (the dev simulator today, an official
+ * results API tomorrow). It skips moderation: MatchApproved goes straight to the outbox.
+ */
+export const recordVerifiedMatch =
+  ({ transaction, clock, ids }: MatchesDeps) =>
+  (command: {
+    placements: FactionPlacements;
+    playedAt: Date;
+  }): Promise<Result<MatchApproved, PlacementsError | 'played-in-future'>> =>
+    transaction.run(({ outbox }) => {
+      const match = verifyMatch({
+        ...command,
+        id: ids.next() as MatchReportId,
+        recordedAt: clock.now(),
+      });
+      if (match.ok) outbox.add(match.value);
+      return Promise.resolve(match);
     });

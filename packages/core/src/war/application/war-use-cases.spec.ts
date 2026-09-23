@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { GAME_CONFIG } from '../../config/game';
 import type { Clock } from '../../shared/application/ports';
 import { inMemoryTransaction, sequentialIds } from '../../shared/application/testing';
 import type { Faction, FactionPlacements } from '../../shared/domain/faction';
@@ -343,5 +344,38 @@ describe('advanceWar', () => {
 
     expect(ownerOf(lonestarFarm)).toBe('lonestar');
     expect(battles.all()).toMatchObject([{ status: 'resolved', winner: 'lonestar' }]);
+  });
+});
+
+describe('the pace of the war', () => {
+  it('can run faster, as in the demo: 1 h rounds and 3 h battles', async () => {
+    const demoRounds = new InMemoryVoteRoundRepository();
+    const demoBattles = new InMemoryBattleRepository();
+    const demo = {
+      ...deps,
+      transaction: inMemoryTransaction({
+        map: new InMemoryWarMapRepository(),
+        rounds: demoRounds,
+        battles: demoBattles,
+      }),
+      pace: GAME_CONFIG.pace.demo,
+    };
+    now = start;
+    await startWar(demo)({ sectors: initialMap });
+    now = at(0.5);
+    await castVoteInRound(demo)({
+      playerId: player('ana'),
+      voterFaction: 'valkyra',
+      sectorId: lonestarFarm,
+    });
+
+    now = at(1);
+    await advanceWar(demo)();
+
+    expect(await demoBattles.findOpen()).toMatchObject([{ startsAt: at(1), endsAt: at(4) }]);
+    expect((await demoRounds.findOpen()).find((r) => r.faction === 'lonestar')).toMatchObject({
+      opensAt: at(1),
+      closesAt: at(2),
+    });
   });
 });

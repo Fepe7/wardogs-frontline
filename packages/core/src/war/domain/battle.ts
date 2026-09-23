@@ -46,8 +46,15 @@ export const openBattle = (params: {
   sector: Sector;
   attacker: Faction;
   startsAt: Date;
+  durationHours?: number;
 }): Result<OpenBattle, 'own-sector'> => {
-  const { id, sector, attacker, startsAt } = params;
+  const {
+    id,
+    sector,
+    attacker,
+    startsAt,
+    durationHours = GAME_CONFIG.pace.standard.battleHours,
+  } = params;
   if (sector.owner === attacker) return err('own-sector');
 
   return ok({
@@ -57,7 +64,7 @@ export const openBattle = (params: {
     attacker,
     defender: sector.owner,
     startsAt,
-    endsAt: new Date(startsAt.getTime() + GAME_CONFIG.battleDurationHours * HOUR_MS),
+    endsAt: new Date(startsAt.getTime() + durationHours * HOUR_MS),
     points: { attacker: 0, defender: 0 },
     scoredReportIds: [],
   });

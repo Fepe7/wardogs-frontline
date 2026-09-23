@@ -9,7 +9,12 @@ import type { FactionPlacements } from '../../shared/domain/faction';
 import type { PlayerId } from '../../shared/domain/player-id';
 import type { MatchReportId } from '../domain/match-report';
 import { InMemoryMatchReportRepository } from './in-memory-match-report-repository';
-import { approveMatchReport, rejectMatchReport, submitMatchReport } from './match-report-use-cases';
+import {
+  approveMatchReport,
+  recordVerifiedMatch,
+  rejectMatchReport,
+  submitMatchReport,
+} from './match-report-use-cases';
 
 const now = new Date('2026-10-01T21:00:00Z');
 const playedAt = new Date('2026-10-01T20:00:00Z');
@@ -158,5 +163,26 @@ describe('rejectMatchReport', () => {
 
     expect(result).toEqual({ ok: false, error: 'missing-reason' });
     expect((await reports.findById(reportId))?.status).toBe('pending');
+  });
+});
+
+describe('recordVerifiedMatch', () => {
+  it('approves the match right away, so the war scores it', async () => {
+    const result = await recordVerifiedMatch(deps)({ placements, playedAt });
+
+    expect(result.ok).toBe(true);
+    expect(outbox.events).toEqual([
+      { type: 'MatchApproved', reportId: 'report-1', placements, playedAt, occurredAt: now },
+    ]);
+  });
+
+  it('records nothing when the result is invalid', async () => {
+    const result = await recordVerifiedMatch(deps)({
+      placements: { ...placements, second: 'valkyra' },
+      playedAt,
+    });
+
+    expect(result).toEqual({ ok: false, error: 'duplicate-faction' });
+    expect(outbox.events).toEqual([]);
   });
 });

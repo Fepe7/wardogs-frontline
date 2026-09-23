@@ -45,12 +45,16 @@ export const openVoteRound = (params: {
   id: VoteRoundId;
   faction: Faction;
   opensAt: Date;
-}): OpenVoteRound => ({
-  status: 'open',
-  ...params,
-  closesAt: new Date(params.opensAt.getTime() + GAME_CONFIG.voteRoundDurationHours * HOUR_MS),
-  votes: [],
-});
+  durationHours?: number;
+}): OpenVoteRound => {
+  const { durationHours = GAME_CONFIG.pace.standard.voteRoundHours, ...round } = params;
+  return {
+    status: 'open',
+    ...round,
+    closesAt: new Date(round.opensAt.getTime() + durationHours * HOUR_MS),
+    votes: [],
+  };
+};
 
 /** Rounds run on the half-open interval [opensAt, closesAt). */
 const isOpenAt = (round: OpenVoteRound, instant: Date): boolean =>
