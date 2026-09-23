@@ -5,6 +5,7 @@ import {
   FACTIONS,
   type OpenBattle,
   type RecentMatch,
+  type ResolvedBattle,
   type Sector,
   type SectorId,
 } from '@frontline/core';
@@ -19,6 +20,8 @@ interface WarMapState {
   readonly openBattles: readonly OpenBattle[];
   /** Newest first; the board replays the latest one. */
   readonly recentMatches: readonly RecentMatch[];
+  /** The war report: the latest decided battles, newest first. */
+  readonly resolvedBattles: readonly ResolvedBattle[];
   /** Demo only: the demo clock runs this far ahead of real time. */
   readonly demoOffsetMs: number;
 }
@@ -28,6 +31,7 @@ const initialState: WarMapState = {
   sectors: [],
   openBattles: [],
   recentMatches: [],
+  resolvedBattles: [],
   demoOffsetMs: 0,
 };
 
@@ -71,6 +75,18 @@ export const WarMapStore = signalStore(
             );
           },
           error: failed,
+        });
+      source
+        .watchResolvedBattles()
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: (resolvedBattles) => {
+            patchState(store, { resolvedBattles });
+          },
+          // Optional on the page: the live board does not depend on it.
+          error: () => {
+            patchState(store, { resolvedBattles: [] });
+          },
         });
       source
         .watchRecentMatches()

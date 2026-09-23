@@ -144,5 +144,12 @@
   "languages": {
     "en": "English",
     "es": "Español"
+  },
+  "warReport": {
+    "title": "War report",
+    "empty": "No battle has been decided yet. The first result arrives when a battle runs out of time.",
+    "takes": "{{attacker}} takes {{sector}} from {{defender}}",
+    "holds": "{{defender}} holds {{sector}} against {{attacker}}",
+    "holdsOnTie": "{{defender}} holds {{sector}} against {{attacker}}: a tie goes to the defender"
   }
 }

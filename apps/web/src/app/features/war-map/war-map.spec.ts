@@ -6,6 +6,7 @@ import {
   type BattleId,
   type OpenBattle,
   type RecentMatch,
+  type ResolvedBattle,
   type Sector,
 } from '@frontline/core';
 import { Subject } from 'rxjs';
@@ -67,6 +68,7 @@ const render = async () => {
           watchOpenBattles: () => battleUpdates,
           watchDemoOffset: () => demoOffsets,
           watchRecentMatches: () => recentUpdates,
+          watchResolvedBattles: () => new Subject<readonly ResolvedBattle[]>(),
         },
       },
     ],

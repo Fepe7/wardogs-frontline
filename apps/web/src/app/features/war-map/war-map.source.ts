@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import type { DocumentSnapshot, Query, QuerySnapshot } from 'firebase/firestore';
-import type { OpenBattle, RecentMatch, Sector } from '@frontline/core';
+import type { OpenBattle, RecentMatch, ResolvedBattle, Sector } from '@frontline/core';
 import { defer, EMPTY, Observable, switchMap } from 'rxjs';
 import {
   FirebaseClient,
@@ -10,6 +10,8 @@ import {
 
 /** firestore.rules only allows battle queries with a limit of at most 50. */
 const MAX_OPEN_BATTLES = 50;
+/** How many decided battles the war report shows. */
+const WAR_REPORT_SIZE = 6;
 
 /**
  * Live reads of the war. The whole map is one document, so following it costs one
@@ -50,24 +52,42 @@ export class WarMapSource {
   }
 
   watchOpenBattles(): Observable<readonly OpenBattle[]> {
-    return this.withFirestore(({ db, sdk }) => {
-      const openBattles: Query = sdk.query(
+    return this.watchQuery<OpenBattle>(({ db, sdk }) =>
+      sdk.query(
         sdk.collection(db, 'battles'),
         sdk.where('status', '==', 'open'),
         sdk.limit(MAX_OPEN_BATTLES),
-      );
-      return new Observable<readonly OpenBattle[]>((subscriber) =>
-        sdk.onSnapshot(
-          openBattles,
-          (snapshot: QuerySnapshot) => {
-            subscriber.next(snapshot.docs.map((d) => fromFirestoreData(d.data()) as OpenBattle));
-          },
-          (error) => {
-            subscriber.error(error);
-          },
+      ),
+    );
+  }
+
+  /** The war report: the latest decided battles, newest first. */
+  watchResolvedBattles(): Observable<readonly ResolvedBattle[]> {
+    return this.watchQuery<ResolvedBattle>(({ db, sdk }) =>
+      sdk.query(
+        sdk.collection(db, 'battles'),
+        sdk.where('status', '==', 'resolved'),
+        sdk.orderBy('endsAt', 'desc'),
+        sdk.limit(WAR_REPORT_SIZE),
+      ),
+    );
+  }
+
+  private watchQuery<T>(build: (client: FirestoreClient) => Query): Observable<readonly T[]> {
+    return this.withFirestore(
+      (client) =>
+        new Observable<readonly T[]>((subscriber) =>
+          client.sdk.onSnapshot(
+            build(client),
+            (snapshot: QuerySnapshot) => {
+              subscriber.next(snapshot.docs.map((d) => fromFirestoreData(d.data()) as T));
+            },
+            (error) => {
+              subscriber.error(error);
+            },
+          ),
         ),
-      );
-    });
+    );
   }
 
   private watchDocument<T>(

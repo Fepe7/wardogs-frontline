@@ -4,11 +4,12 @@ import { GAME_CONFIG } from '@frontline/core';
 import { environment } from '../../../environments/environment';
 import { LastMatch } from '../war-map/last-match';
 import { WarMap } from '../war-map/war-map';
+import { WarReport } from '../war-map/war-report';
 import { WarMapStore } from '../war-map/war-map.store';
 
 @Component({
   selector: 'app-home-page',
-  imports: [TranslocoPipe, LastMatch, WarMap],
+  imports: [TranslocoPipe, LastMatch, WarMap, WarReport],
   // One store for the page: the board header and the board share the live war.
   providers: [WarMapStore],
   template: `
@@ -32,6 +33,14 @@ import { WarMapStore } from '../war-map/war-map.store';
         />
       </header>
       <app-war-map />
+    </section>
+
+    <section aria-labelledby="war-report-title" class="pt-14 sm:pt-20">
+      <app-war-report
+        [battles]="store.resolvedBattles()"
+        [sectorNames]="store.sectorNames()"
+        [timeOffsetMs]="store.demoOffsetMs()"
+      />
     </section>
 
     <section aria-labelledby="how-title" class="py-14 sm:py-20">

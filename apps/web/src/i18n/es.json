@@ -144,5 +144,12 @@
   "languages": {
     "en": "English",
     "es": "Español"
+  },
+  "warReport": {
+    "title": "Parte de guerra",
+    "empty": "Todavía no se ha decidido ninguna batalla. El primer resultado llega cuando a una batalla se le acaba el tiempo.",
+    "takes": "{{attacker}} conquista {{sector}} a {{defender}}",
+    "holds": "{{defender}} resiste en {{sector}} frente a {{attacker}}",
+    "holdsOnTie": "{{defender}} resiste en {{sector}} frente a {{attacker}}: el empate es para el defensor"
   }
 }
