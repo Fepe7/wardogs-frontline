@@ -30,7 +30,7 @@ export const SEASON_RESULT_EXAMPLE = {
   imports: [TranslocoPipe],
   template: `
     <article class="max-w-prose py-12 sm:py-20">
-      <h1 class="font-display text-5xl leading-none font-extrabold text-balance sm:text-6xl">
+      <h1 class="font-display text-4xl leading-[0.95] font-black text-balance sm:text-6xl">
         {{ 'about.title' | transloco }}
       </h1>
       <p class="mt-6 text-lg text-chalk-muted">{{ 'about.lead' | transloco }}</p>

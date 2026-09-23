@@ -22,7 +22,7 @@ type FastForwardState =
       type="button"
       (click)="skip()"
       [disabled]="state().kind === 'running'"
-      class="rounded-sm border border-chalk px-3 py-1 font-semibold hover:bg-chalk hover:text-table disabled:cursor-wait disabled:opacity-60"
+      class="bg-signal px-3 py-1 text-xs font-bold tracking-[0.15em] text-table uppercase hover:bg-chalk disabled:cursor-wait disabled:opacity-60"
     >
       {{ (state().kind === 'running' ? 'demo.fastForwarding' : 'demo.fastForward') | transloco }}
     </button>

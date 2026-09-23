@@ -21,6 +21,7 @@ import { WarMapStore } from './war-map.store';
       @case ('ready') {
         <div class="mt-6 grid gap-10 lg:grid-cols-[2fr_1fr]">
           <app-hex-map
+            class="hud-frame block p-4 sm:p-6"
             [sectors]="store.sectors()"
             [attacks]="attacks()"
             [label]="'warMap.mapLabel' | transloco"

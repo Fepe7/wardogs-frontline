@@ -1,8 +1,10 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens: a backlit tactical plotting table. The three factions are the only
- * strong colors, and they are for the map and large marks, not for body text.
+ * Design tokens, in the visual language of WARDOGS and BULKHEAD (near-black, warm cream,
+ * heavy uppercase headings, an amber accent, HUD details) without any of their assets:
+ * no logos, art or fonts of theirs. The factions are the only other strong colors, and
+ * they are for the map and large marks, not for body text.
  *
  * Faction colors follow the game: Lonestar blue, Valkyra red, Manticore green. No
  * official values are published, so these shades are our own, tuned for this background
@@ -10,31 +12,57 @@
  * color-blind players; each faction also has its own texture on the map.
  */
 @theme {
-  --color-table: #14202b;
-  --color-table-raised: #1b2a38;
-  --color-grid: #2c3e4f;
-  --color-chalk: #e8ede4;
-  --color-chalk-muted: #a9b6b8;
+  --color-table: #0e0e0d;
+  --color-table-raised: #191816;
+  --color-grid: #2b2a27;
+  --color-chalk: #efe7d8;
+  --color-chalk-muted: #a8a298;
+  /* Accent for the one thing to notice: the kicker and the demo action. */
+  --color-signal: #e8b33a;
   --color-lonestar: #3f8ad8;
   --color-valkyra: #c8414b;
   --color-manticore: #7dbb5b;
 
-  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --font-display: 'Archivo', 'Arial Black', sans-serif;
   --font-sans: 'Public Sans', system-ui, sans-serif;
 }
 
 @layer base {
   body {
     background-color: var(--color-table);
+    /* A faint grid of crosses, like a tactical plotting sheet. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M44 48h8M48 44v8' stroke='%23efe7d8' stroke-opacity='0.07' stroke-width='1.5'/%3E%3C/svg%3E");
     color: var(--color-chalk);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Headings: wide, heavy and uppercase, as in the WARDOGS brand. */
+  .font-display {
+    font-stretch: 118%;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
   :focus-visible {
-    outline: 2px solid var(--color-chalk);
+    outline: 2px solid var(--color-signal);
     outline-offset: 3px;
   }
+}
+
+/* HUD corner brackets around a panel, as on the BULKHEAD site. */
+@utility hud-frame {
+  --hud: var(--color-chalk-muted);
+  --arm: 16px;
+  background:
+    linear-gradient(var(--hud), var(--hud)) top left / var(--arm) 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top left / 2px var(--arm) no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top right / var(--arm) 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top right / 2px var(--arm) no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom left / var(--arm) 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom left / 2px var(--arm) no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / var(--arm) 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 2px var(--arm) no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {

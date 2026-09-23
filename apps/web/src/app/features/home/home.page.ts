@@ -8,8 +8,13 @@ import { WarMap } from '../war-map/war-map';
   imports: [TranslocoPipe, WarMap],
   template: `
     <section class="py-12 sm:py-20">
+      <p
+        class="inline-block bg-signal px-2 py-1 text-xs font-bold tracking-[0.2em] text-table uppercase"
+      >
+        {{ 'home.kicker' | transloco }}
+      </p>
       <h1
-        class="max-w-4xl font-display text-5xl leading-none font-extrabold text-balance sm:text-7xl"
+        class="mt-5 max-w-4xl font-display text-4xl leading-[0.95] font-black text-balance sm:text-6xl"
       >
         {{ 'home.title' | transloco }}
       </h1>

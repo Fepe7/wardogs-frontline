@@ -25,10 +25,10 @@ import { FrontlineMark } from './frontline-mark';
               <li>
                 <a
                   [routerLink]="link.path"
-                  routerLinkActive="text-chalk underline"
+                  routerLinkActive="text-signal! underline"
                   ariaCurrentWhenActive="page"
                   [routerLinkActiveOptions]="{ exact: true }"
-                  class="text-chalk-muted underline-offset-8 hover:text-chalk"
+                  class="text-sm font-semibold tracking-[0.15em] text-chalk-muted uppercase underline-offset-8 hover:text-chalk"
                 >
                   {{ link.label | transloco }}
                 </a>
