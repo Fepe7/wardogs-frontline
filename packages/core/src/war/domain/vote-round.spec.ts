@@ -5,7 +5,7 @@ import {
   openVoteRound,
   tallyVotes,
   withdrawVote,
-  type VoteRound,
+  type OpenVoteRound,
   type VoteRoundId,
 } from './vote-round';
 import type { Sector, SectorId } from './war-map';
@@ -32,12 +32,18 @@ const map: readonly Sector[] = [
 const steelValley = 'steel-valley' as SectorId;
 const lonestarHq = 'lonestar-hq' as SectorId;
 const player = (id: string) => id as PlayerId;
+const nobodyUnderAttack: ReadonlySet<SectorId> = new Set();
 
-const newRound = (): VoteRound =>
+const newRound = (): OpenVoteRound =>
   openVoteRound({ id: 'round-1' as VoteRoundId, faction: 'valkyra', opensAt });
 
-const vote = (round: VoteRound, playerId: string, sectorId: SectorId, hours: number): VoteRound => {
-  const result = castVote(round, map, {
+const vote = (
+  round: OpenVoteRound,
+  playerId: string,
+  sectorId: SectorId,
+  hours: number,
+): OpenVoteRound => {
+  const result = castVote(round, map, nobodyUnderAttack, {
     playerId: player(playerId),
     voterFaction: 'valkyra',
     sectorId,
@@ -47,9 +53,13 @@ const vote = (round: VoteRound, playerId: string, sectorId: SectorId, hours: num
   return result.value;
 };
 
+const tally = (round: OpenVoteRound, battleMap = map, underAttack = nobodyUnderAttack) =>
+  tallyVotes(round, { now: at(24), map: battleMap, underAttack });
+
 describe('openVoteRound', () => {
   it('opens a 24 h round with no votes', () => {
     expect(newRound()).toEqual({
+      status: 'open',
       id: 'round-1',
       faction: 'valkyra',
       opensAt,
@@ -73,7 +83,7 @@ describe('castVote', () => {
   });
 
   it('rejects players from another faction', () => {
-    const result = castVote(newRound(), map, {
+    const result = castVote(newRound(), map, nobodyUnderAttack, {
       playerId: player('spy'),
       voterFaction: 'manticore',
       sectorId: steelValley,
@@ -84,7 +94,7 @@ describe('castVote', () => {
   });
 
   it('rejects sectors the faction cannot attack', () => {
-    const result = castVote(newRound(), map, {
+    const result = castVote(newRound(), map, nobodyUnderAttack, {
       playerId: player('ana'),
       voterFaction: 'valkyra',
       sectorId: 'north-dam' as SectorId,
@@ -94,9 +104,20 @@ describe('castVote', () => {
     expect(result).toEqual({ ok: false, error: 'not-adjacent' });
   });
 
+  it('rejects sectors already under attack', () => {
+    const result = castVote(newRound(), map, new Set([steelValley]), {
+      playerId: player('ana'),
+      voterFaction: 'valkyra',
+      sectorId: steelValley,
+      castAt: at(1),
+    });
+
+    expect(result).toEqual({ ok: false, error: 'sector-under-attack' });
+  });
+
   it('rejects votes before the round opens or once it has closed', () => {
     const cast = (hours: number) =>
-      castVote(newRound(), map, {
+      castVote(newRound(), map, nobodyUnderAttack, {
         playerId: player('ana'),
         voterFaction: 'valkyra',
         sectorId: steelValley,
@@ -126,14 +147,16 @@ describe('withdrawVote', () => {
 });
 
 describe('tallyVotes', () => {
-  it('attacks the most voted sector', () => {
+  it('closes the round and attacks the most voted sector', () => {
     let round = vote(newRound(), 'ana', steelValley, 1);
     round = vote(round, 'ben', steelValley, 2);
     round = vote(round, 'cai', lonestarHq, 3);
 
-    expect(tallyVotes(round, at(24))).toEqual({
-      ok: true,
-      value: { kind: 'attack', sectorId: 'steel-valley' },
+    const result = tally(round);
+
+    expect(result.ok && result.value).toMatchObject({
+      status: 'closed',
+      outcome: { kind: 'attack', sectorId: 'steel-valley' },
     });
   });
 
@@ -144,17 +167,42 @@ describe('tallyVotes', () => {
     round = vote(round, 'dan', lonestarHq, 4);
 
     // Both have 2 votes: steel-valley got its 2nd at hour 3, lonestar-hq at hour 4.
-    expect(tallyVotes(round, at(24))).toEqual({
-      ok: true,
-      value: { kind: 'attack', sectorId: 'steel-valley' },
-    });
+    const result = tally(round);
+
+    expect(result.ok && result.value.outcome).toEqual({ kind: 'attack', sectorId: 'steel-valley' });
+  });
+
+  it('attacks the next most voted sector when the winner is no longer attackable', () => {
+    let round = vote(newRound(), 'ana', steelValley, 1);
+    round = vote(round, 'ben', steelValley, 2);
+    round = vote(round, 'cai', lonestarHq, 3);
+
+    const result = tally(round, map, new Set([steelValley]));
+
+    expect(result.ok && result.value.outcome).toEqual({ kind: 'attack', sectorId: 'lonestar-hq' });
+  });
+
+  it('does not attack when no voted sector is attackable any more', () => {
+    const round = vote(newRound(), 'ana', steelValley, 1);
+    const conqueredByValkyra = map.map((s) =>
+      s.id === steelValley ? { ...s, owner: 'valkyra' as const } : s,
+    );
+
+    const result = tally(round, conqueredByValkyra);
+
+    expect(result.ok && result.value.outcome).toEqual({ kind: 'no-attack' });
   });
 
   it('does not attack when nobody voted', () => {
-    expect(tallyVotes(newRound(), at(24))).toEqual({ ok: true, value: { kind: 'no-attack' } });
+    const result = tally(newRound());
+
+    expect(result.ok && result.value.outcome).toEqual({ kind: 'no-attack' });
   });
 
   it('cannot be tallied before the round closes', () => {
-    expect(tallyVotes(newRound(), at(23))).toEqual({ ok: false, error: 'round-not-closed' });
+    expect(tallyVotes(newRound(), { now: at(23), map, underAttack: nobodyUnderAttack })).toEqual({
+      ok: false,
+      error: 'round-not-closed',
+    });
   });
 });

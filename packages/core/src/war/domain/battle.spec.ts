@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { FactionPlacements } from '../../shared/domain/faction';
-import { openBattle, resolveBattle, scoreMatch, type BattleId, type OpenBattle } from './battle';
+import {
+  openBattle,
+  resolveBattle,
+  scoreMatch,
+  type BattleId,
+  type OpenBattle,
+  type ScorableMatch,
+} from './battle';
 import type { Sector, SectorId } from './war-map';
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -37,6 +44,23 @@ const manticoreWinsValkyraSecond: FactionPlacements = {
   third: 'lonestar',
 };
 
+let reportCounter = 0;
+const match = (placements: FactionPlacements, hours = 1, reportId?: string): ScorableMatch => {
+  reportCounter += 1;
+  return {
+    reportId: reportId ?? `report-${String(reportCounter)}`,
+    placements,
+    playedAt: at(hours),
+  };
+};
+
+const scored = (battle: OpenBattle, ...matches: ScorableMatch[]): OpenBattle =>
+  matches.reduce((current, played) => {
+    const result = scoreMatch(current, played);
+    if (!result.ok) throw new Error(result.error);
+    return result.value;
+  }, battle);
+
 describe('openBattle', () => {
   it('opens a 48 h battle between the attacker and the sector owner, starting at 0-0', () => {
     expect(newBattle()).toEqual({
@@ -48,6 +72,7 @@ describe('openBattle', () => {
       startsAt: start,
       endsAt: at(48),
       points: { attacker: 0, defender: 0 },
+      scoredReportIds: [],
     });
   });
 
@@ -65,38 +90,45 @@ describe('openBattle', () => {
 
 describe('scoreMatch', () => {
   it('adds the points each side earned in a match played during the battle', () => {
-    const result = scoreMatch(newBattle(), valkyraWins, at(1));
-
-    expect(result.ok && result.value.points).toEqual({ attacker: 3, defender: 2 });
+    expect(scored(newBattle(), match(valkyraWins)).points).toEqual({ attacker: 3, defender: 2 });
   });
 
   it('also counts matches won by the third faction', () => {
-    const result = scoreMatch(newBattle(), manticoreWinsValkyraSecond, at(1));
-
-    expect(result.ok && result.value.points).toEqual({ attacker: 2, defender: 1 });
+    expect(scored(newBattle(), match(manticoreWinsValkyraSecond)).points).toEqual({
+      attacker: 2,
+      defender: 1,
+    });
   });
 
   it('accumulates points across matches', () => {
-    const first = scoreMatch(newBattle(), valkyraWins, at(1));
-    if (!first.ok) throw new Error(first.error);
-    const second = scoreMatch(first.value, lonestarWins, at(2));
+    expect(scored(newBattle(), match(valkyraWins), match(lonestarWins, 2)).points).toEqual({
+      attacker: 5,
+      defender: 5,
+    });
+  });
 
-    expect(second.ok && second.value.points).toEqual({ attacker: 5, defender: 5 });
+  it('scores each report only once, so a retried event never counts twice', () => {
+    const played = match(valkyraWins, 1, 'report-x');
+
+    const battle = scored(newBattle(), played, played);
+
+    expect(battle.points).toEqual({ attacker: 3, defender: 2 });
+    expect(battle.scoredReportIds).toEqual(['report-x']);
   });
 
   it('does not modify the original battle', () => {
     const battle = newBattle();
-    scoreMatch(battle, valkyraWins, at(1));
+    scoreMatch(battle, match(valkyraWins));
 
     expect(battle.points).toEqual({ attacker: 0, defender: 0 });
   });
 
   it('ignores matches played before the battle started or once it has ended', () => {
-    expect(scoreMatch(newBattle(), valkyraWins, at(-1))).toEqual({
+    expect(scoreMatch(newBattle(), match(valkyraWins, -1))).toEqual({
       ok: false,
       error: 'match-outside-battle',
     });
-    expect(scoreMatch(newBattle(), valkyraWins, at(48))).toEqual({
+    expect(scoreMatch(newBattle(), match(valkyraWins, 48))).toEqual({
       ok: false,
       error: 'match-outside-battle',
     });
@@ -104,15 +136,8 @@ describe('scoreMatch', () => {
 });
 
 describe('resolveBattle', () => {
-  const scored = (...matches: FactionPlacements[]): OpenBattle =>
-    matches.reduce((battle, placements) => {
-      const result = scoreMatch(battle, placements, at(1));
-      if (!result.ok) throw new Error(result.error);
-      return result.value;
-    }, newBattle());
-
   it('gives the sector to the attacker when it scores more points', () => {
-    const result = resolveBattle(scored(valkyraWins), at(48));
+    const result = resolveBattle(scored(newBattle(), match(valkyraWins)), at(48));
 
     expect(result.ok && result.value).toMatchObject({
       status: 'resolved',
@@ -123,13 +148,16 @@ describe('resolveBattle', () => {
   });
 
   it('keeps the sector with the defender when it scores more points', () => {
-    const result = resolveBattle(scored(lonestarWins), at(48));
+    const result = resolveBattle(scored(newBattle(), match(lonestarWins)), at(48));
 
     expect(result.ok && result.value).toMatchObject({ winner: 'lonestar', conquered: false });
   });
 
   it('keeps the sector with the defender on a tie', () => {
-    const result = resolveBattle(scored(valkyraWins, lonestarWins), at(48));
+    const result = resolveBattle(
+      scored(newBattle(), match(valkyraWins), match(lonestarWins)),
+      at(48),
+    );
 
     expect(result.ok && result.value).toMatchObject({ winner: 'lonestar', conquered: false });
   });

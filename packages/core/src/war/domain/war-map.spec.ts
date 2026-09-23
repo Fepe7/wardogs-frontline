@@ -24,6 +24,12 @@ describe('attackableSectors', () => {
     ]);
   });
 
+  it('excludes sectors already under attack', () => {
+    const underAttack = new Set(['valkyra-hq' as SectorId]);
+
+    expect(attackableSectors(map, 'lonestar', underAttack).map((s) => s.id)).toEqual(['north-dam']);
+  });
+
   it('is empty for a faction without territory', () => {
     const lonestarOnly = map.map((s) => ({ ...s, owner: 'lonestar' as const }));
     expect(attackableSectors(lonestarOnly, 'valkyra')).toEqual([]);
@@ -49,6 +55,15 @@ describe('canAttack', () => {
     expect(canAttack(map, 'valkyra', 'valkyra-hq' as SectorId)).toEqual({
       ok: false,
       error: 'own-sector',
+    });
+  });
+
+  it('rejects a sector that is already under attack', () => {
+    const underAttack = new Set(['steel-valley' as SectorId]);
+
+    expect(canAttack(map, 'valkyra', 'steel-valley' as SectorId, underAttack)).toEqual({
+      ok: false,
+      error: 'sector-under-attack',
     });
   });
 

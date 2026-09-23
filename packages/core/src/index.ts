@@ -13,6 +13,8 @@ export * from './war/domain/hex-coord';
 export * from './war/domain/match-points';
 export * from './war/domain/vote-round';
 export * from './war/domain/war-map';
+export type * from './war/application/ports';
+export * from './war/application/war-use-cases';
 
 // Matches context
 export * from './matches/domain/match-report';
