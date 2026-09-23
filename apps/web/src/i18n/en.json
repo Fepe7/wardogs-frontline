@@ -61,21 +61,19 @@
   },
   "about": {
     "title": "About Wardogs Frontline",
-    "lead": "A fan-made season war for WARDOGS: the matches people already play decide who holds each sector of a shared map.",
+    "lead": "A season-long war built to plug into WARDOGS: the matches people already play decide who holds each sector of a shared map.",
     "whatTitle": "What it is",
     "whatText": "Players join Lonestar, Valkyra or Manticore and vote on which neighbouring sector their faction attacks next. The attack becomes a battle, and every real match played while it lasts adds points: {{first}} for first place, {{second}} for second and {{third}} for third. When the battle ends, the side with more points holds the sector. At the end of the season, the faction with the most sectors wins.",
     "demoTitle": "How this demo works",
     "demoText": "There are no real results yet, so bots vote and a simulated match is played every 10 minutes. Here votes last {{demoVoteHours}} hour and battles {{demoBattleHours}} hours; in a real season they would last {{seasonVoteHours}} and {{seasonBattleHours}} hours. Use “Skip 1 hour” at the top of the page to watch the war move.",
     "connectTitle": "Connecting real matches",
-    "connectText": "For each finished match, the war only needs to know how the three factions placed. The simplest way would be a webhook that sends one small message when a match ends:",
+    "connectText": "For each finished match, the war only needs to know how the three factions placed. On your side, that is one webhook; everything else already runs. It would send one small message when a match ends:",
     "connectNotes": {
       "privacy": "No player data: only the match id, when it ended and the faction placements.",
       "signed": "Signed with a shared secret, so only your servers can send results.",
       "idempotent": "Each match id counts once, so retries are safe.",
       "pull": "A read-only endpoint, such as “matches finished since a given time”, would work just as well."
     },
-    "sourceTitle": "Source code",
-    "sourceText": "The project is open source:",
     "rewardsTitle": "Rewarding the winning faction",
     "rewardsText": "The war becomes a long-term goal inside the WARDOGS economy if the players who win it get something for it. At the end of each season, the faction holding the most sectors wins, and its players are rewarded in proportion to what they contributed.",
     "rewardsPoints": {
@@ -85,7 +83,27 @@
       "threshold": "A minimum number of counted matches, so switching to the winning side at the last minute is not worth it."
     },
     "rewardsDataText": "At the end of the season, the war would send you the winner and the ids of the matches that counted for it:",
-    "rewardsFit": "You already know who played each of those matches and for which faction, so no player data leaves your side. It builds on the stronger seasonal meta game you plan for Early Access, and it rewards the time and impact players bring to a match."
+    "rewardsFit": "You already know who played each of those matches and for which faction, so no player data leaves your side. It builds on the stronger seasonal meta game you plan for Early Access, and it rewards the time and impact players bring to a match.",
+    "valueTitle": "What it brings to WARDOGS",
+    "valuePoints": {
+      "stakes": "Every match counts beyond itself: it moves a front that the whole community can see.",
+      "return": "A reason to come back between sessions: a battle to win tonight, a vote to settle tomorrow.",
+      "story": "A shared story for each season, made by the players, that the community and streamers can follow and talk about.",
+      "season": "It builds on the stronger seasonal meta game you have announced for Early Access, without touching the game client."
+    },
+    "qualityTitle": "Built to production standards",
+    "qualityPoints": {
+      "security": "Clients only read. Every write goes through server functions with App Check, validation, authorization and rate limits, and the database rules are tested.",
+      "tests": "Over 200 automated tests, including the database rules and the server functions running against the Firebase emulators.",
+      "cost": "Designed for cost: the whole map is a single document and every live query has a limit.",
+      "access": "Accessible (factions are told apart by texture as well as color) and translated, English first.",
+      "brand": "Respects the WARDOGS brand: no official logos or art, a fan-made notice on every page, and no real money of any kind."
+    },
+    "authorTitle": "Who built it",
+    "authorText": "Wardogs Frontline is designed and built by Fepe7, a software developer and WARDOGS fan.",
+    "authorOffer": "I would be glad to connect it to WARDOGS with your team, and to run and grow Frontline as part of the game: operating the seasons, evolving it with the community and keeping it to your standards.",
+    "authorProfile": "GitHub",
+    "authorCode": "Source code"
   },
   "languages": {
     "en": "English",

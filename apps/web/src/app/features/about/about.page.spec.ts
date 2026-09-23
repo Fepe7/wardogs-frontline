@@ -60,11 +60,14 @@ describe('the about page', () => {
     );
   });
 
-  it('links to the source code', async () => {
+  it('says who built it and links to their profile and the source code', async () => {
     const page = await render();
+    const author = page.querySelector('#about-author')?.parentElement;
 
-    expect(page.querySelector('a')?.getAttribute('href')).toBe(
+    expect(author?.textContent).toContain('built by Fepe7');
+    expect([...(author?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href'))).toEqual([
+      'https://github.com/Fepe7',
       'https://github.com/Fepe7/wardogs-frontline',
-    );
+    ]);
   });
 });
