@@ -52,7 +52,9 @@
     "score": "Puntos de cada bando",
     "attacker": "ataca",
     "defender": "defiende",
-    "endsAt": "Termina el {{time}}"
+    "endsAt": "Termina el {{time}}",
+    "attackTitle": "{{attacker}} ataca {{sector}}, de {{defender}}",
+    "attackKey": "Ataque en curso: la flecha sale de la facción que ataca."
   },
   "languages": {
     "en": "English",

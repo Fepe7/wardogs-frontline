@@ -52,7 +52,9 @@
     "score": "Points of each side",
     "attacker": "attacking",
     "defender": "defending",
-    "endsAt": "Ends {{time}}"
+    "endsAt": "Ends {{time}}",
+    "attackTitle": "{{attacker}} attacks {{sector}}, held by {{defender}}",
+    "attackKey": "Attack in progress: the arrow comes from the attacking faction."
   },
   "languages": {
     "en": "English",

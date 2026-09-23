@@ -1,13 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
-import { initialWarMap, type BattleId, type OpenBattle, type Sector } from '@frontline/core';
+import {
+  areAdjacent,
+  initialWarMap,
+  type BattleId,
+  type OpenBattle,
+  type Sector,
+} from '@frontline/core';
 import { Subject } from 'rxjs';
 import en from '../../../i18n/en.json';
 import { WarMap } from './war-map';
 import { WarMapSource } from './war-map.source';
 
 const map = initialWarMap();
-const target = map.find((sector) => sector.owner === 'lonestar') as Sector;
+// A Lonestar sector on the Valkyra border, so Valkyra can really attack it.
+const target = map.find(
+  (sector) =>
+    sector.owner === 'lonestar' &&
+    map.some((other) => other.owner === 'valkyra' && areAdjacent(other.coord, sector.coord)),
+) as Sector;
 
 const battle: OpenBattle = {
   status: 'open',
@@ -112,6 +123,20 @@ describe('the war map', () => {
     await push(map, [{ ...battle, endsAt: new Date(battle.endsAt.getTime() + HOUR_MS) }]);
 
     expect(endsAt(page.querySelector('ul')?.textContent)).toBe(before);
+  });
+
+  it('shows who attacks each sector: an arrow in the attacker color and a tooltip', async () => {
+    const { page, push } = await render();
+
+    await push(map, [battle]);
+
+    const arrows = page.querySelectorAll('line[marker-end]');
+    expect(arrows).toHaveLength(1);
+    expect(arrows[0]?.getAttribute('class')).toContain('stroke-valkyra');
+    const titles = [...page.querySelectorAll('svg[role="img"] g > title')].map(
+      (t) => t.textContent,
+    );
+    expect(titles).toContain(`Valkyra attacks ${target.name}, held by Lonestar`);
   });
 
   it('describes the map for screen readers', async () => {

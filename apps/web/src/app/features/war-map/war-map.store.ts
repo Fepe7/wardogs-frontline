@@ -25,10 +25,7 @@ const initialState: WarMapState = {
 /** State of the war map feature: the live map and the battles in progress. */
 export const WarMapStore = signalStore(
   withState(initialState),
-  withComputed(({ sectors, openBattles }) => ({
-    sectorsUnderAttack: computed(
-      (): ReadonlySet<SectorId> => new Set(openBattles().map((battle) => battle.sectorId)),
-    ),
+  withComputed(({ sectors }) => ({
     territory: computed(() =>
       FACTIONS.map((faction) => ({
         faction,
