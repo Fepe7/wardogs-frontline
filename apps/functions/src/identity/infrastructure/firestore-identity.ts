@@ -36,3 +36,9 @@ export const identityContext =
     players: new FirestorePlayerRepository(db, transaction),
     outbox,
   });
+
+/** Read outside a transaction, for handlers that only need the current player state. */
+export const readPlayer = async (db: Firestore, id: PlayerId): Promise<Player | null> => {
+  const snapshot = await db.collection(COLLECTIONS.players).doc(id).get();
+  return snapshot.exists ? (fromDocument(snapshot.data()) as Player) : null;
+};

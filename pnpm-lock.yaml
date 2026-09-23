@@ -217,6 +217,9 @@ importers:
       firebase-functions:
         specifier: ^7.4.0
         version: 7.4.0(firebase-admin@14.4.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(supports-color@7.2.0)
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -297,6 +300,16 @@ importers:
       '@types/node':
         specifier: ^24.13.6
         version: 24.13.6
+
+  packages/contracts:
+    dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@frontline/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/core: {}
 

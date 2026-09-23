@@ -15,6 +15,7 @@ export const COLLECTIONS = {
   war: 'war',
   voteRounds: 'voteRounds',
   battles: 'battles',
+  rateLimits: 'rateLimits',
 } as const;
 
 /**

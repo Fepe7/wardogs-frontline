@@ -5,7 +5,8 @@
     // Workspace packages are bundled by esbuild instead of being declared as
     // `workspace:*` dependencies, which Cloud Build could not install.
     "paths": {
-      "@frontline/core": ["../../packages/core/src/index.ts"]
+      "@frontline/core": ["../../packages/core/src/index.ts"],
+      "@frontline/contracts": ["../../packages/contracts/src/index.ts"]
     }
   },
   "include": ["src"]

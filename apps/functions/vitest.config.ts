@@ -3,10 +3,13 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
-    // Same resolution as tsconfig paths / esbuild: the core is bundled, not installed.
+    // Same resolution as tsconfig paths / esbuild: workspace packages are bundled, not installed.
     alias: {
       '@frontline/core': fileURLToPath(
         new URL('../../packages/core/src/index.ts', import.meta.url),
+      ),
+      '@frontline/contracts': fileURLToPath(
+        new URL('../../packages/contracts/src/index.ts', import.meta.url),
       ),
     },
   },
