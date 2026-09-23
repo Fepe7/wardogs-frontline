@@ -1,12 +1,58 @@
 rules_version = '2';
 
-// Clients never write: every write goes through Cloud Functions (Admin SDK),
-// which bypass these rules. Public reads are opened collection by collection
-// as each feature lands, each one with its test (docs/ARQUITECTURA.md §7).
+// Clients never write: every write goes through Cloud Functions (Admin SDK), which
+// bypass these rules. Clients only read what their screens need, and every list query
+// must carry a limit() so a listener cannot read a whole growing collection
+// (docs/ARQUITECTURA.md §5 and §7). Anything not matched below is denied, including
+// events/, rateLimits/ and steamNonces/, which only the server uses.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isModerator() {
+      return signedIn() && request.auth.token.moderator == true;
+    }
+
+    function limitedTo(max) {
+      return request.query.limit != null && request.query.limit <= max;
+    }
+
+    // Read from the player document, like the callables do: a custom claim would stay
+    // stale until the token refreshes (up to 1 h) after a faction change. Costs 1 read.
+    // A player without allegiance has no faction, so the comparison fails and denies.
+    function isInFaction(faction) {
+      return signedIn()
+        && get(/databases/$(database)/documents/players/$(request.auth.uid)).data.allegiance.faction == faction;
+    }
+
+    // The whole map in one public document.
+    match /war/map {
+      allow get: if true;
+    }
+
+    match /battles/{battleId} {
+      allow get: if true;
+      allow list: if limitedTo(50);
+    }
+
+    // Votes are secret between factions: the enemy must not see where you will attack.
+    match /voteRounds/{roundId} {
+      allow get: if isInFaction(resource.data.faction);
+      allow list: if isInFaction(resource.data.faction) && limitedTo(10);
+    }
+
+    match /players/{playerId} {
+      allow get: if signedIn() && (request.auth.uid == playerId || isModerator());
+    }
+
+    // Authors follow their own reports; moderators work through the queue.
+    match /matchReports/{reportId} {
+      allow get: if signedIn() && (resource.data.reportedBy == request.auth.uid || isModerator());
+      allow list: if signedIn()
+        && (resource.data.reportedBy == request.auth.uid || isModerator())
+        && limitedTo(50);
     }
   }
 }
