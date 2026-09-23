@@ -14,3 +14,6 @@ coverage/
 .firebase/
 *-debug.log
 *.stackdump
+
+# Parámetros no secretos de Functions para el emulador
+!apps/functions/.env.demo-frontline

@@ -20,7 +20,7 @@ export interface CallableInput {
   readonly data: unknown;
 }
 
-const fail = (code: FunctionsErrorCode, reason: string): never => {
+export const fail = (code: FunctionsErrorCode, reason: string): never => {
   const details: CallableErrorDetails = { reason };
   throw new HttpsError(code, reason, details);
 };

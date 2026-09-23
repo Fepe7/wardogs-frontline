@@ -33,6 +33,23 @@ export const rejectReportRequest = z.strictObject({
 });
 export type RejectReportRequest = z.infer<typeof rejectReportRequest>;
 
+/**
+ * The OpenID 2.0 parameters Steam appends to the return URL after login. The web app
+ * forwards them untouched; the server verifies them with Steam before trusting any.
+ */
+const MAX_OPENID_PARAMS = 20;
+export const signInWithSteamRequest = z.strictObject({
+  assertion: z
+    .record(z.string().regex(/^openid\.[a-z_.]{1,32}$/), z.string().max(1024))
+    .refine((params) => Object.keys(params).length <= MAX_OPENID_PARAMS),
+});
+export type SignInWithSteamRequest = z.infer<typeof signInWithSteamRequest>;
+
+export interface SignInWithSteamResponse {
+  /** Firebase custom token: the web app signs in with `signInWithCustomToken`. */
+  readonly token: string;
+}
+
 /** Error payload sent by every callable: `reason` is a stable code the web app translates. */
 export interface CallableErrorDetails {
   readonly reason: string;

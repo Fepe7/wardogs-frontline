@@ -3,6 +3,7 @@ import {
   approveReportRequest,
   castVoteRequest,
   rejectReportRequest,
+  signInWithSteamRequest,
   submitReportRequest,
   swearAllegianceRequest,
 } from './callables';
@@ -67,5 +68,30 @@ describe('moderation requests', () => {
     expect(rejectReportRequest.safeParse({ reportId: 'r1', reason: 'x'.repeat(501) }).success).toBe(
       false,
     );
+  });
+});
+
+describe('signInWithSteamRequest', () => {
+  const assertion = {
+    'openid.mode': 'id_res',
+    'openid.claimed_id': 'https://steamcommunity.com/openid/id/76561198000000001',
+  };
+
+  it('accepts the openid.* parameters Steam sends back', () => {
+    expect(signInWithSteamRequest.safeParse({ assertion }).success).toBe(true);
+  });
+
+  it('rejects foreign keys, oversized values and too many parameters', () => {
+    const tooMany = Object.fromEntries(
+      Array.from({ length: 21 }, (_, i) => [`openid.p${String(i)}`, 'x']),
+    );
+    for (const data of [
+      { assertion: { ...assertion, token: 'x' } },
+      { assertion: { ...assertion, 'openid.sig': 'x'.repeat(1025) } },
+      { assertion: tooMany },
+      { assertion, extra: 1 },
+    ]) {
+      expect(signInWithSteamRequest.safeParse(data).success).toBe(false);
+    }
   });
 });
