@@ -1,3 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/*
+ * Design tokens: a backlit tactical plotting table. The three factions are the only
+ * strong colors, and they are for the map and large marks, not for body text.
+ */
+@theme {
+  --color-table: #14202b;
+  --color-table-raised: #1b2a38;
+  --color-grid: #2c3e4f;
+  --color-chalk: #e8ede4;
+  --color-chalk-muted: #a9b6b8;
+  --color-lonestar: #e0a33b;
+  --color-valkyra: #4fb3bf;
+  --color-manticore: #d1495b;
+
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --font-sans: 'Public Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-table);
+    color: var(--color-chalk);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-chalk);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

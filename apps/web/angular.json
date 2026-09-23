@@ -68,7 +68,12 @@
               "buildTarget": "web:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "prebundle": {
+              "exclude": ["@frontline/core"]
+            }
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

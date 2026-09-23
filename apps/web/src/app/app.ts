@@ -1,12 +1,25 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { environment } from '../environments/environment';
+import { DemoBanner } from './core/layout/demo-banner';
+import { SiteFooter } from './core/layout/site-footer';
+import { SiteHeader } from './core/layout/site-header';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+  imports: [RouterOutlet, DemoBanner, SiteHeader, SiteFooter],
+  host: { class: 'flex min-h-dvh flex-col' },
+  template: `
+    @if (demoMode) {
+      <app-demo-banner />
+    }
+    <app-site-header />
+    <main class="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">
+      <router-outlet />
+    </main>
+    <app-site-footer />
+  `,
 })
 export class App {
-  protected readonly title = signal('web');
+  protected readonly demoMode = environment.demoMode;
 }

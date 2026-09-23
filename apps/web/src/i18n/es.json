@@ -1,0 +1,36 @@
+{
+  "site": {
+    "name": "Wardogs Frontline",
+    "home": "Wardogs Frontline, inicio"
+  },
+  "demo": {
+    "notice": "Demo: la guerra funciona con jugadores y partidas simulados hasta que se conecten resultados reales."
+  },
+  "footer": {
+    "disclaimer": "Wardogs Frontline es un proyecto de la comunidad hecho por fans, sin relación con Bulkhead ni Team17 y sin su respaldo. WARDOGS es una marca de sus respectivos propietarios.",
+    "language": "Idioma"
+  },
+  "home": {
+    "title": "Cada partida que juegas mueve el frente",
+    "lead": "Únete a una facción, vota dónde ataca después y conserva el sector con los puntos que ganas en partidas reales de Wardogs.",
+    "howTitle": "Cómo funciona la guerra",
+    "steps": {
+      "vote": {
+        "title": "Vota",
+        "text": "Cada facción vota qué sector enemigo vecino atacar. El sector con más votos se convierte en el objetivo."
+      },
+      "fight": {
+        "title": "Combate",
+        "text": "El ataque abre una batalla. Cada partida jugada mientras dura da puntos: {{first}} por el primer puesto, {{second}} por el segundo y {{third}} por el tercero."
+      },
+      "hold": {
+        "title": "Conserva el sector",
+        "text": "Cuando termina la batalla, el bando con más puntos se queda el sector. Los empates son para el defensor. Después, la facción vuelve a votar."
+      }
+    }
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español"
+  }
+}

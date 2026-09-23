@@ -1,0 +1,36 @@
+{
+  "site": {
+    "name": "Wardogs Frontline",
+    "home": "Wardogs Frontline, home"
+  },
+  "demo": {
+    "notice": "Demo: the war runs on simulated players and matches until real match results are connected."
+  },
+  "footer": {
+    "disclaimer": "Wardogs Frontline is a fan-made community project, not affiliated with or endorsed by Bulkhead or Team17. WARDOGS is a trademark of its respective owners.",
+    "language": "Language"
+  },
+  "home": {
+    "title": "Every match you play moves the front",
+    "lead": "Join a faction, vote on where it attacks next, and hold the sector with the points you earn in real Wardogs matches.",
+    "howTitle": "How the war works",
+    "steps": {
+      "vote": {
+        "title": "Vote",
+        "text": "Each faction votes on which neighbouring enemy sector to attack. The sector with the most votes becomes the target."
+      },
+      "fight": {
+        "title": "Fight",
+        "text": "The attack opens a battle. Every match played while it lasts gives points: {{first}} for first place, {{second}} for second and {{third}} for third."
+      },
+      "hold": {
+        "title": "Hold the sector",
+        "text": "When the battle ends, the side with more points keeps the sector. Ties go to the defender. Then the faction votes again."
+      }
+    }
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español"
+  }
+}
