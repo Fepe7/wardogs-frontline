@@ -29,6 +29,26 @@
       }
     }
   },
+  "factions": {
+    "lonestar": "Lonestar",
+    "valkyra": "Valkyra",
+    "manticore": "Manticore"
+  },
+  "warMap": {
+    "title": "The front",
+    "mapLabel": "War map",
+    "mapSummary": "Lonestar holds {{lonestar}} sectors, Valkyra {{valkyra}} and Manticore {{manticore}}. Battles in progress: {{battles}}.",
+    "loading": "Loading the front…",
+    "notStarted": "The war has not started yet. The map appears as soon as the first season begins.",
+    "error": "The map could not be loaded. Check your connection and reload the page.",
+    "territory": "Sectors held",
+    "battlesTitle": "Battles in progress",
+    "noBattles": "No battles right now. The factions are voting on their next attack.",
+    "score": "Points of each side",
+    "attacker": "attacking",
+    "defender": "defending",
+    "endsAt": "Ends {{time}}"
+  },
   "languages": {
     "en": "English",
     "es": "Español"

@@ -11,7 +11,8 @@
   "scripts": {
     "build": "node build.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "test:integration": "firebase emulators:exec --only firestore,auth --project demo-frontline \"vitest run\""
+    "test:integration": "firebase emulators:exec --only firestore,auth --project demo-frontline \"vitest run\"",
+    "seed:demo": "node build.mjs --seed && node node_modules/.cache/seed-demo.mjs"
   },
   "dependencies": {
     "firebase-admin": "^14.4.0",

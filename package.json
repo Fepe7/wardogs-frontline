@@ -17,7 +17,8 @@
     "test:integration": "pnpm --filter @frontline/functions test:integration",
     "build": "pnpm -r --if-present build",
     "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
-    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude"
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
+    "seed:demo": "pnpm --filter @frontline/functions seed:demo"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

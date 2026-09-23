@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GAME_CONFIG } from '@frontline/core';
+import { WarMap } from '../war-map/war-map';
 
 @Component({
   selector: 'app-home-page',
-  imports: [TranslocoPipe],
+  imports: [TranslocoPipe, WarMap],
   template: `
     <section class="py-12 sm:py-20">
       <h1
@@ -13,6 +14,10 @@ import { GAME_CONFIG } from '@frontline/core';
         {{ 'home.title' | transloco }}
       </h1>
       <p class="mt-6 max-w-prose text-lg text-chalk-muted">{{ 'home.lead' | transloco }}</p>
+    </section>
+
+    <section aria-labelledby="front-title" class="border-t border-grid py-12">
+      <app-war-map />
     </section>
 
     <section aria-labelledby="how-title" class="border-t border-grid py-12">

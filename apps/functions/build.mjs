@@ -6,11 +6,15 @@ import { readFile, rm } from 'node:fs/promises';
 
 const pkg = JSON.parse(await readFile(new URL('./package.json', import.meta.url), 'utf8'));
 
-await rm('dist', { recursive: true, force: true });
+// `--seed` builds the local seeding script instead (pnpm seed:demo). It goes under
+// node_modules/.cache so it is never deployed with dist/.
+const seed = process.argv.includes('--seed');
+const outfile = seed ? 'node_modules/.cache/seed-demo.mjs' : 'dist/index.js';
+if (!seed) await rm('dist', { recursive: true, force: true });
 
 await build({
-  entryPoints: ['src/index.ts'],
-  outfile: 'dist/index.js',
+  entryPoints: [seed ? 'src/simulation/seed-demo.ts' : 'src/index.ts'],
+  outfile,
   bundle: true,
   platform: 'node',
   format: 'esm',
