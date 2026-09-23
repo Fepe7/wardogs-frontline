@@ -134,6 +134,10 @@
     "notFound": {
       "title": "Página no encontrada | Wardogs Frontline",
       "description": "Esta página no existe. Vuelve al frente."
+    },
+    "sector": {
+      "title": "{{sector}} | Wardogs Frontline",
+      "description": "{{sector}}, un sector de la guerra de temporada de Wardogs Frontline: quién lo controla, la batalla por él y su historial."
     }
   },
   "notFound": {
@@ -151,5 +155,14 @@
     "takes": "{{attacker}} conquista {{sector}} a {{defender}}",
     "holds": "{{defender}} resiste en {{sector}} frente a {{attacker}}",
     "holdsOnTie": "{{defender}} resiste en {{sector}} frente a {{attacker}}: el empate es para el defensor"
+  },
+  "sector": {
+    "back": "El frente",
+    "heldBy": "En manos de {{faction}}",
+    "underAttack": "Atacado por {{faction}}",
+    "mapSummary": "Mapa de la guerra con {{sector}} marcado.",
+    "historyTitle": "Historial de batallas",
+    "historyEmpty": "Todavía no se ha librado ninguna batalla aquí.",
+    "notFound": "Este sector no existe"
   }
 }

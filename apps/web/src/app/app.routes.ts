@@ -15,6 +15,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/about/about.page').then((m) => m.AboutPage),
   },
   {
+    path: 'sector/:id',
+    data: page('sector'),
+    loadComponent: () => import('./features/sector/sector.page').then((m) => m.SectorPage),
+  },
+  {
     path: '**',
     data: page('notFound'),
     loadComponent: () => import('./features/not-found/not-found.page').then((m) => m.NotFoundPage),

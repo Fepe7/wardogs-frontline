@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco';
 import en from '../../../i18n/en.json';
@@ -17,7 +17,7 @@ const setup = async () => {
         preloadLangs: true,
       }),
     ],
-    providers: [provideRouter(routes)],
+    providers: [provideRouter(routes, withComponentInputBinding())],
   });
   TestBed.inject(Seo).start();
   const harness = await RouterTestingHarness.create();
@@ -48,6 +48,15 @@ describe('page titles and link previews', () => {
     await harness.fixture.whenStable();
 
     expect(document.title).toBe(es.meta.home.title);
+  });
+
+  it('name the sector on its own page, so a shared link says where the fight is', async () => {
+    const { harness, document, tag } = await setup();
+
+    await harness.navigateByUrl('/sector/iron-ford');
+
+    expect(document.title).toBe('Iron Ford | Wardogs Frontline');
+    expect(tag('property="og:description"')).toContain('Iron Ford');
   });
 
   it('show a page of their own for unknown addresses', async () => {

@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import type { DocumentSnapshot, Query, QuerySnapshot } from 'firebase/firestore';
-import type { OpenBattle, RecentMatch, ResolvedBattle, Sector } from '@frontline/core';
+import type { OpenBattle, RecentMatch, ResolvedBattle, Sector, SectorId } from '@frontline/core';
 import { defer, EMPTY, Observable, switchMap } from 'rxjs';
 import {
   FirebaseClient,
@@ -12,6 +12,8 @@ import {
 const MAX_OPEN_BATTLES = 50;
 /** How many decided battles the war report shows. */
 const WAR_REPORT_SIZE = 6;
+/** How many decided battles a sector page shows. */
+const SECTOR_HISTORY_SIZE = 10;
 
 /**
  * Live reads of the war. The whole map is one document, so following it costs one
@@ -69,6 +71,19 @@ export class WarMapSource {
         sdk.where('status', '==', 'resolved'),
         sdk.orderBy('endsAt', 'desc'),
         sdk.limit(WAR_REPORT_SIZE),
+      ),
+    );
+  }
+
+  /** The decided battles for one sector, newest first. */
+  watchSectorHistory(sectorId: SectorId): Observable<readonly ResolvedBattle[]> {
+    return this.watchQuery<ResolvedBattle>(({ db, sdk }) =>
+      sdk.query(
+        sdk.collection(db, 'battles'),
+        sdk.where('sectorId', '==', sectorId),
+        sdk.where('status', '==', 'resolved'),
+        sdk.orderBy('endsAt', 'desc'),
+        sdk.limit(SECTOR_HISTORY_SIZE),
       ),
     );
   }

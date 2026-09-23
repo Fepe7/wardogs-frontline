@@ -15,13 +15,20 @@ type Outcome = 'takes' | 'holds' | 'holdsOnTie';
   selector: 'app-war-report',
   imports: [DatePipe, TranslocoPipe, FactionSwatch],
   template: `
-    <h2 id="war-report-title" class="font-display font-wide text-3xl font-black sm:text-4xl">
-      {{ 'warReport.title' | transloco }}
+    <h2
+      id="war-report-title"
+      [class]="
+        compact()
+          ? 'font-display text-lg font-extrabold text-chalk-muted'
+          : 'font-display font-wide text-3xl font-black sm:text-4xl'
+      "
+    >
+      {{ titleKey() | transloco }}
     </h2>
     @if (battles().length === 0) {
-      <p class="mt-4 text-chalk-muted">{{ 'warReport.empty' | transloco }}</p>
+      <p class="mt-4 text-chalk-muted">{{ emptyKey() | transloco }}</p>
     } @else {
-      <ol class="mt-6 border-t border-grid">
+      <ol [class]="compact() ? 'mt-2 border-t border-grid' : 'mt-6 border-t border-grid'">
         @for (battle of battles(); track battle.id) {
           <li
             class="grid grid-cols-[auto_1fr_auto] items-center gap-x-4 border-b border-grid py-3 sm:grid-cols-[4rem_auto_1fr_auto]"
@@ -63,6 +70,11 @@ export class WarReport {
   readonly sectorNames = input.required<ReadonlyMap<SectorId, string>>();
   /** How far war time runs ahead of real time (only in the demo). */
   readonly timeOffsetMs = input(0);
+  /** The heading: the whole war's report, or one sector's history. */
+  readonly titleKey = input('warReport.title');
+  readonly emptyKey = input('warReport.empty');
+  /** Inside the board (a sector page) the heading is a board label, not a page title. */
+  readonly compact = input(false);
 
   protected realTime(warTime: Date): Date {
     return new Date(warTime.getTime() - this.timeOffsetMs());

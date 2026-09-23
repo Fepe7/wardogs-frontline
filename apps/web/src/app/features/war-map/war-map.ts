@@ -1,4 +1,4 @@
-import { afterNextRender, Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
@@ -8,10 +8,9 @@ import { FactionPatterns } from './faction-patterns';
 import { FactionSwatch } from './faction-swatch';
 import { FlapText } from './flap-text';
 import { HexMap, type MapAttack } from './hex-map';
+import { injectWarClock } from './war-clock';
 import { WarMapStore } from './war-map.store';
 
-/** The board's clock ticks often enough to keep the minutes left exact. */
-const CLOCK_TICK_MS = 15_000;
 /** Standings are set in billing weight: the more sectors, the bigger the name. */
 const STANDING_BASE_REM = 0.9;
 const STANDING_REM_PER_SHARE = 2.4;
@@ -116,23 +115,7 @@ export class WarMap {
   private readonly language = toSignal(this.transloco.langChanges$);
   protected readonly demoMode = environment.demoMode;
 
-  /** Real time, read in the browser only (the server render has no running clock). */
-  private readonly nowMs = signal(0);
-  /** Time on the war's clock: in the demo it runs ahead by the fast-forward offset. */
-  protected readonly warNowMs = computed(() => this.nowMs() + this.store.demoOffsetMs());
-
-  constructor() {
-    const destroyRef = inject(DestroyRef);
-    afterNextRender(() => {
-      this.nowMs.set(Date.now());
-      const tick = setInterval(() => {
-        this.nowMs.set(Date.now());
-      }, CLOCK_TICK_MS);
-      destroyRef.onDestroy(() => {
-        clearInterval(tick);
-      });
-    });
-  }
+  protected readonly warNowMs = injectWarClock();
 
   /** Factions ranked by sectors held, each name sized by its share of the map. */
   protected readonly standings = computed(() => {

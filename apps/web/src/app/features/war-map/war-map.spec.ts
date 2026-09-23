@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import {
   areAdjacent,
@@ -60,6 +61,7 @@ const render = async () => {
       }),
     ],
     providers: [
+      provideRouter([]),
       WarMapStore,
       {
         provide: WarMapSource,
@@ -109,7 +111,7 @@ describe('the war map', () => {
 
     await push(map);
 
-    expect(page.querySelectorAll('svg[role="img"] g.tile')).toHaveLength(36);
+    expect(page.querySelectorAll('svg[role="group"] g.tile')).toHaveLength(36);
     expect(spoken(page.querySelector('dl'))).toBe('Lonestar 12 Valkyra 12 Manticore 12');
   });
 
@@ -186,7 +188,7 @@ describe('the war map', () => {
     const arrows = page.querySelectorAll('line[marker-end]');
     expect(arrows).toHaveLength(1);
     expect(arrows[0]?.getAttribute('class')).toContain('stroke-valkyra');
-    const titles = [...page.querySelectorAll('svg[role="img"] g > title')].map(
+    const titles = [...page.querySelectorAll('svg[role="group"] g > title')].map(
       (t) => t.textContent,
     );
     expect(titles).toContain(`Valkyra attacks ${target.name}, held by Lonestar`);

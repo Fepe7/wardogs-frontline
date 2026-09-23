@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { OpenBattle, RecentMatch, SectorId } from '@frontline/core';
 import { FactionSwatch } from './faction-swatch';
@@ -24,7 +25,7 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
  */
 @Component({
   selector: 'app-battle-list',
-  imports: [TranslocoPipe, FactionSwatch, FlapText],
+  imports: [RouterLink, TranslocoPipe, FactionSwatch, FlapText],
   template: `
     <h3 class="font-display text-lg font-extrabold text-chalk-muted">
       {{ 'warMap.battlesTitle' | transloco }}
@@ -45,10 +46,12 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
                 ></span>
               }
             }
-            <app-flap-text
-              class="relative text-[1.2rem] text-chalk"
-              [text]="sectorNames().get(battle.sectorId) ?? battle.sectorId"
-            />
+            <a
+              [routerLink]="['/sector', battle.sectorId]"
+              class="sector-link relative inline-flex text-[1.2rem] text-chalk"
+            >
+              <app-flap-text [text]="sectorNames().get(battle.sectorId) ?? battle.sectorId" />
+            </a>
             <div class="relative mt-2 flex items-center justify-between gap-4">
               <p class="text-xs text-chalk-muted">
                 {{
@@ -112,6 +115,15 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
     }
   `,
   styles: `
+    .sector-link {
+      text-decoration: underline 2px transparent;
+      text-underline-offset: 6px;
+      transition: text-decoration-color 120ms ease;
+    }
+    .sector-link:focus-visible,
+    .sector-link:hover {
+      text-decoration-color: var(--color-signal);
+    }
     .row-flash {
       background: color-mix(in oklab, var(--color-signal) 16%, transparent);
       opacity: 0;

@@ -1,4 +1,5 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { Router } from '@angular/router';
 import { FACTIONS, type Faction, type Sector, type SectorId } from '@frontline/core';
 import { attackArrow } from './attack-arrows';
 import { patternOf } from './faction-patterns';
@@ -30,8 +31,9 @@ const splitOf = (sector: Sector) => {
 @Component({
   selector: 'app-hex-map',
   template: `
+    <!-- A group, not an image: every sector is a link to its own page. -->
     <svg
-      role="img"
+      role="group"
       [attr.viewBox]="viewBox()"
       aria-labelledby="war-map-title war-map-summary"
       class="h-auto w-full"
@@ -55,23 +57,36 @@ const splitOf = (sector: Sector) => {
       </defs>
       <!-- Tracked by sector and owner: a conquered sector is a new tile that flips in. -->
       @for (hex of hexes(); track hex.id + hex.owner) {
-        <g class="tile" [style.--i]="$index">
-          <title>{{ hex.title }}</title>
-          <polygon
-            [attr.points]="hex.points"
-            [class]="'stroke-table-raised ' + fills[hex.owner]"
-            stroke-width="1.6"
-          />
-          <polygon [attr.points]="hex.points" [attr.fill]="hex.pattern" />
-          <line
-            [attr.x1]="hex.split.x1"
-            [attr.x2]="hex.split.x2"
-            [attr.y1]="hex.split.y"
-            [attr.y2]="hex.split.y"
-            class="stroke-table-raised"
-            stroke-width="0.6"
-          />
-        </g>
+        <a
+          class="hex-link"
+          [attr.href]="hex.href"
+          [attr.aria-label]="hex.title"
+          (click)="open($event, hex.href)"
+        >
+          <g class="tile" [style.--i]="$index">
+            <title>{{ hex.title }}</title>
+            <polygon
+              [attr.points]="hex.points"
+              [class]="'stroke-table-raised ' + fills[hex.owner]"
+              stroke-width="1.6"
+            />
+            <polygon [attr.points]="hex.points" [attr.fill]="hex.pattern" />
+            <line
+              [attr.x1]="hex.split.x1"
+              [attr.x2]="hex.split.x2"
+              [attr.y1]="hex.split.y"
+              [attr.y2]="hex.split.y"
+              class="stroke-table-raised"
+              stroke-width="0.6"
+            />
+            <!-- Keyboard focus and hover, drawn on the tile itself. -->
+            <polygon
+              [attr.points]="hex.points"
+              class="hex-focus fill-none stroke-signal"
+              stroke-width="2"
+            />
+          </g>
+        </a>
       }
       <g class="pointer-events-none stroke-chalk" stroke-width="1.4" stroke-linecap="round">
         @for (segment of front(); track $index) {
@@ -83,6 +98,13 @@ const splitOf = (sector: Sector) => {
           />
         }
       </g>
+      @if (selectedHex(); as selected) {
+        <polygon
+          [attr.points]="selected.points"
+          class="pointer-events-none fill-none stroke-chalk"
+          stroke-width="3"
+        />
+      }
       <!-- Drawn last, so no neighbouring hex covers the outline of a sector under attack. -->
       @for (hex of hexesUnderAttack(); track hex.id) {
         <polygon
@@ -115,6 +137,22 @@ const splitOf = (sector: Sector) => {
     </svg>
   `,
   styles: `
+    .hex-link {
+      outline: none;
+      cursor: pointer;
+    }
+    .hex-focus {
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+    .hex-link:focus-visible .hex-focus {
+      opacity: 1;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .hex-link:hover .hex-focus {
+        opacity: 1;
+      }
+    }
     .tile {
       transform-box: fill-box;
       transform-origin: center;
@@ -142,6 +180,10 @@ export class HexMap {
   readonly attacks = input.required<readonly MapAttack[]>();
   readonly label = input.required<string>();
   readonly summary = input.required<string>();
+  /** A sector page highlights its own sector. */
+  readonly selectedSectorId = input<SectorId | null>(null);
+
+  private readonly router = inject(Router);
 
   protected readonly factions = FACTIONS;
   // Full class names, so Tailwind finds them in the source.
@@ -171,6 +213,7 @@ export class HexMap {
         owner: sector.owner,
         points: hexPoints(sector.coord),
         split: splitOf(sector),
+        href: `/sector/${sector.id}`,
         pattern: patternOf(sector.owner),
         underAttack: attack !== undefined,
       };
@@ -178,6 +221,17 @@ export class HexMap {
   );
 
   protected readonly front = computed(() => frontLine(this.sectors()));
+
+  protected readonly selectedHex = computed(
+    () => this.hexes().find((hex) => hex.id === this.selectedSectorId()) ?? null,
+  );
+
+  /** In-app navigation, while the tile stays a real link (new tab, copy address). */
+  protected open(event: MouseEvent, href: string): void {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    void this.router.navigateByUrl(href);
+  }
 
   protected readonly hexesUnderAttack = computed(() =>
     this.hexes().filter((hex) => hex.underAttack),
