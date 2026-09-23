@@ -8,6 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "dev": "pnpm --filter @frontline/web start",
     "lint": "eslint .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
