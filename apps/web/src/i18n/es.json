@@ -117,7 +117,10 @@
     "authorText": "Wardogs Frontline está diseñado y desarrollado por Fepe7, desarrollador de software y fan de WARDOGS.",
     "authorOffer": "Me encantaría conectarlo a WARDOGS con vuestro equipo, y llevar y hacer crecer Frontline como parte del juego: gestionar las temporadas, evolucionarlo con la comunidad y mantenerlo a vuestra altura.",
     "authorProfile": "GitHub",
-    "authorCode": "Código fuente"
+    "authorCode": "Código fuente",
+    "contents": "Contenido",
+    "sheetMatch": "Resultado de partida · lo envía WARDOGS al terminar cada partida",
+    "sheetSeason": "Resultado de temporada · se devuelve al terminar la temporada"
   },
   "meta": {
     "home": {

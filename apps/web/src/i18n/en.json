@@ -117,7 +117,10 @@
     "authorText": "Wardogs Frontline is designed and built by Fepe7, a software developer and WARDOGS fan.",
     "authorOffer": "I would be glad to connect it to WARDOGS with your team, and to run and grow Frontline as part of the game: operating the seasons, evolving it with the community and keeping it to your standards.",
     "authorProfile": "GitHub",
-    "authorCode": "Source code"
+    "authorCode": "Source code",
+    "contents": "Contents",
+    "sheetMatch": "Match result · sent by WARDOGS after each match",
+    "sheetSeason": "Season result · sent back at the end of the season"
   },
   "meta": {
     "home": {

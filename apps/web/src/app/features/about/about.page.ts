@@ -24,103 +24,207 @@ export const SEASON_RESULT_EXAMPLE = {
   countedMatchIds: ['7c9e6679-7425-40de-944b-e07fc1f90ae7', '1b4e28ba-2fa1-11d2-883f-0016d3cca427'],
 } as const;
 
-/** The project explained for Bulkhead: what it is, how the demo runs and what it would need. */
+/**
+ * The project explained for Bulkhead, as a contract dossier in the board's language:
+ * what it is, how the demo runs, what it would need and who would run it.
+ */
 @Component({
   selector: 'app-about-page',
   imports: [TranslocoPipe],
   template: `
-    <article class="max-w-prose py-12 sm:py-20">
-      <h1 class="font-display text-4xl leading-[0.95] font-black text-balance sm:text-6xl">
-        {{ 'about.title' | transloco }}
-      </h1>
-      <p class="mt-6 text-lg text-chalk-muted">{{ 'about.lead' | transloco }}</p>
+    <article class="board mt-5 mb-14 sm:mt-6 sm:mb-20">
+      <header class="border-b border-grid px-4 py-6 sm:px-8 sm:py-8">
+        <h1
+          class="font-display font-wide text-[1.9rem] leading-[0.95] font-black text-balance sm:text-5xl"
+        >
+          {{ 'about.title' | transloco }}
+        </h1>
+        <p class="mt-4 max-w-[62ch] text-lg text-chalk-muted">{{ 'about.lead' | transloco }}</p>
+      </header>
 
-      <section aria-labelledby="about-what" class="mt-12">
-        <h2 id="about-what" class="font-display text-3xl font-bold">
-          {{ 'about.whatTitle' | transloco }}
-        </h2>
-        <p class="mt-3">{{ 'about.whatText' | transloco: points }}</p>
-      </section>
+      <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <!-- The dossier's index: a long read, so every section stays one click away. -->
+        <nav
+          [attr.aria-label]="'about.contents' | transloco"
+          class="hidden border-grid lg:block lg:border-r"
+        >
+          <ul class="sticky top-6 px-8 py-8">
+            @for (section of sections; track section.id) {
+              <li class="border-t border-grid first:border-t-0">
+                <a
+                  [href]="'#' + section.id"
+                  class="block py-2 font-display text-base font-extrabold text-chalk-muted hover:text-chalk"
+                  >{{ section.title | transloco }}</a
+                >
+              </li>
+            }
+          </ul>
+        </nav>
 
-      <section aria-labelledby="about-value" class="mt-12">
-        <h2 id="about-value" class="font-display text-3xl font-bold">
-          {{ 'about.valueTitle' | transloco }}
-        </h2>
-        <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-chalk-muted">
-          @for (point of valuePoints; track point) {
-            <li>{{ 'about.valuePoints.' + point | transloco }}</li>
-          }
-        </ul>
-      </section>
+        <div class="px-4 pb-10 sm:px-8 lg:px-12">
+          <section aria-labelledby="about-what" class="dossier-section">
+            <h2 id="about-what" class="dossier-title">{{ 'about.whatTitle' | transloco }}</h2>
+            <p class="dossier-text">{{ 'about.whatText' | transloco: points }}</p>
+          </section>
 
-      <section aria-labelledby="about-demo" class="mt-12">
-        <h2 id="about-demo" class="font-display text-3xl font-bold">
-          {{ 'about.demoTitle' | transloco }}
-        </h2>
-        <p class="mt-3">{{ 'about.demoText' | transloco: pace }}</p>
-      </section>
+          <section aria-labelledby="about-value" class="dossier-section">
+            <h2 id="about-value" class="dossier-title">{{ 'about.valueTitle' | transloco }}</h2>
+            <ul class="dossier-list">
+              @for (point of valuePoints; track point) {
+                <li>{{ 'about.valuePoints.' + point | transloco }}</li>
+              }
+            </ul>
+          </section>
 
-      <section aria-labelledby="about-connect" class="mt-12">
-        <h2 id="about-connect" class="font-display text-3xl font-bold">
-          {{ 'about.connectTitle' | transloco }}
-        </h2>
-        <p class="mt-3">{{ 'about.connectText' | transloco }}</p>
-        <pre
-          class="mt-4 overflow-x-auto rounded-sm border border-grid bg-table-raised p-4 text-sm"
-        ><code>{{ resultMessage }}</code></pre>
-        <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-chalk-muted">
-          @for (note of notes; track note) {
-            <li>{{ 'about.connectNotes.' + note | transloco }}</li>
-          }
-        </ul>
-      </section>
+          <section aria-labelledby="about-demo" class="dossier-section">
+            <h2 id="about-demo" class="dossier-title">{{ 'about.demoTitle' | transloco }}</h2>
+            <p class="dossier-text">{{ 'about.demoText' | transloco: pace }}</p>
+          </section>
 
-      <section aria-labelledby="about-rewards" class="mt-12">
-        <h2 id="about-rewards" class="font-display text-3xl font-bold">
-          {{ 'about.rewardsTitle' | transloco }}
-        </h2>
-        <p class="mt-3">{{ 'about.rewardsText' | transloco }}</p>
-        <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-chalk-muted">
-          @for (point of rewardPoints; track point) {
-            <li>{{ 'about.rewardsPoints.' + point | transloco }}</li>
-          }
-        </ul>
-        <p class="mt-4">{{ 'about.rewardsDataText' | transloco }}</p>
-        <pre
-          class="mt-4 overflow-x-auto rounded-sm border border-grid bg-table-raised p-4 text-sm"
-        ><code>{{ seasonResult }}</code></pre>
-        <p class="mt-4 text-chalk-muted">{{ 'about.rewardsFit' | transloco }}</p>
-      </section>
+          <section aria-labelledby="about-connect" class="dossier-section">
+            <h2 id="about-connect" class="dossier-title">
+              {{ 'about.connectTitle' | transloco }}
+            </h2>
+            <p class="dossier-text">{{ 'about.connectText' | transloco }}</p>
+            <figure class="sheet">
+              <figcaption class="sheet-caption">{{ 'about.sheetMatch' | transloco }}</figcaption>
+              <pre class="sheet-body"><code>{{ resultMessage }}</code></pre>
+            </figure>
+            <ul class="dossier-list">
+              @for (note of notes; track note) {
+                <li>{{ 'about.connectNotes.' + note | transloco }}</li>
+              }
+            </ul>
+          </section>
 
-      <section aria-labelledby="about-quality" class="mt-12">
-        <h2 id="about-quality" class="font-display text-3xl font-bold">
-          {{ 'about.qualityTitle' | transloco }}
-        </h2>
-        <ul class="mt-4 list-disc space-y-2 pl-5 marker:text-chalk-muted">
-          @for (point of qualityPoints; track point) {
-            <li>{{ 'about.qualityPoints.' + point | transloco }}</li>
-          }
-        </ul>
-      </section>
+          <section aria-labelledby="about-rewards" class="dossier-section">
+            <h2 id="about-rewards" class="dossier-title">
+              {{ 'about.rewardsTitle' | transloco }}
+            </h2>
+            <p class="dossier-text">{{ 'about.rewardsText' | transloco }}</p>
+            <ul class="dossier-list">
+              @for (point of rewardPoints; track point) {
+                <li>{{ 'about.rewardsPoints.' + point | transloco }}</li>
+              }
+            </ul>
+            <p class="dossier-text">{{ 'about.rewardsDataText' | transloco }}</p>
+            <figure class="sheet">
+              <figcaption class="sheet-caption">{{ 'about.sheetSeason' | transloco }}</figcaption>
+              <pre class="sheet-body"><code>{{ seasonResult }}</code></pre>
+            </figure>
+            <p class="dossier-text text-chalk-muted">{{ 'about.rewardsFit' | transloco }}</p>
+          </section>
 
-      <section aria-labelledby="about-author" class="mt-12 border-t border-grid pt-12">
-        <h2 id="about-author" class="font-display text-3xl font-bold">
-          {{ 'about.authorTitle' | transloco }}
-        </h2>
-        <p class="mt-3">{{ 'about.authorText' | transloco }}</p>
-        <p class="mt-3">{{ 'about.authorOffer' | transloco }}</p>
-        <ul class="mt-4 space-y-1">
-          @for (link of links; track link.href) {
-            <li>
-              {{ link.label | transloco }}:
-              <a [href]="link.href" class="underline underline-offset-4 hover:text-chalk-muted">{{
-                link.text
-              }}</a>
-            </li>
-          }
-        </ul>
-      </section>
+          <section aria-labelledby="about-quality" class="dossier-section">
+            <h2 id="about-quality" class="dossier-title">
+              {{ 'about.qualityTitle' | transloco }}
+            </h2>
+            <ul class="dossier-list">
+              @for (point of qualityPoints; track point) {
+                <li>{{ 'about.qualityPoints.' + point | transloco }}</li>
+              }
+            </ul>
+          </section>
+
+          <!-- Closes the dossier like a signature block. -->
+          <section aria-labelledby="about-author" class="signature">
+            <h2 id="about-author" class="font-display font-wide text-3xl font-black">
+              {{ 'about.authorTitle' | transloco }}
+            </h2>
+            <p class="dossier-text">{{ 'about.authorText' | transloco }}</p>
+            <p class="dossier-text">{{ 'about.authorOffer' | transloco }}</p>
+            <ul class="mt-5 flex flex-col gap-2 sm:flex-row sm:gap-8">
+              @for (link of links; track link.href) {
+                <li class="text-sm text-chalk-muted">
+                  {{ link.label | transloco }}:
+                  <a
+                    [href]="link.href"
+                    class="font-semibold text-chalk underline decoration-signal underline-offset-4 hover:text-signal"
+                    >{{ link.text }}</a
+                  >
+                </li>
+              }
+            </ul>
+          </section>
+        </div>
+      </div>
     </article>
+  `,
+  styles: `
+    .dossier-section {
+      scroll-margin-top: 1.5rem;
+      padding-block: 2.5rem 0.5rem;
+      border-top: 1px solid var(--color-grid);
+    }
+    .dossier-section:first-child {
+      border-top: 0;
+    }
+    .dossier-title {
+      font-family: var(--font-display);
+      font-stretch: 72%;
+      font-weight: 900;
+      font-size: 1.5rem;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .dossier-text {
+      max-width: 68ch;
+      margin-top: 0.9rem;
+      line-height: 1.65;
+    }
+    .dossier-list {
+      max-width: 68ch;
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.6rem;
+      line-height: 1.6;
+    }
+    /* A small gunmetal tile as the bullet, from the board's own material. */
+    .dossier-list li {
+      position: relative;
+      padding-left: 1.4rem;
+    }
+    .dossier-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 2px;
+      background: var(--color-grid);
+    }
+    /* A technical sheet for each proposed message. */
+    .sheet {
+      max-width: 68ch;
+      margin-top: 1.25rem;
+      border: 1px solid var(--color-grid);
+      background: var(--color-table);
+    }
+    .sheet-caption {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--color-grid);
+      font-family: var(--font-display);
+      font-stretch: 72%;
+      font-weight: 800;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      color: var(--color-signal);
+    }
+    .sheet-body {
+      overflow-x: auto;
+      padding: 1rem;
+      font-family: var(--font-data);
+      font-stretch: 75%;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .signature {
+      margin-top: 2.5rem;
+      padding: 2rem 0 0.5rem;
+      border-top: 6px solid var(--color-grid);
+      scroll-margin-top: 1.5rem;
+    }
   `,
 })
 export class AboutPage {
@@ -137,6 +241,16 @@ export class AboutPage {
   protected readonly rewardPoints = ['when', 'who', 'what', 'threshold'] as const;
   protected readonly valuePoints = ['stakes', 'return', 'story', 'season'] as const;
   protected readonly qualityPoints = ['security', 'tests', 'cost', 'access', 'brand'] as const;
+  /** The dossier's index, in reading order. */
+  protected readonly sections = [
+    { id: 'about-what', title: 'about.whatTitle' },
+    { id: 'about-value', title: 'about.valueTitle' },
+    { id: 'about-demo', title: 'about.demoTitle' },
+    { id: 'about-connect', title: 'about.connectTitle' },
+    { id: 'about-rewards', title: 'about.rewardsTitle' },
+    { id: 'about-quality', title: 'about.qualityTitle' },
+    { id: 'about-author', title: 'about.authorTitle' },
+  ] as const;
   protected readonly links = [
     { label: 'about.authorProfile', href: 'https://github.com/Fepe7', text: 'github.com/Fepe7' },
     {
