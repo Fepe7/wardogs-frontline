@@ -3,6 +3,11 @@
 /*
  * Design tokens: a backlit tactical plotting table. The three factions are the only
  * strong colors, and they are for the map and large marks, not for body text.
+ *
+ * Faction colors follow the game: Lonestar blue, Valkyra red, Manticore green. No
+ * official values are published, so these shades are our own, tuned for this background
+ * (at least 3:1 contrast) and spread in lightness so red and green stay apart for
+ * color-blind players; each faction also has its own texture on the map.
  */
 @theme {
   --color-table: #14202b;
@@ -10,9 +15,9 @@
   --color-grid: #2c3e4f;
   --color-chalk: #e8ede4;
   --color-chalk-muted: #a9b6b8;
-  --color-lonestar: #e0a33b;
-  --color-valkyra: #4fb3bf;
-  --color-manticore: #d1495b;
+  --color-lonestar: #3f8ad8;
+  --color-valkyra: #c8414b;
+  --color-manticore: #7dbb5b;
 
   --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
   --font-sans: 'Public Sans', system-ui, sans-serif;
