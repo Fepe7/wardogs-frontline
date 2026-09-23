@@ -34,7 +34,7 @@ const architecture = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: ['packages/*/tsconfig.json', 'apps/*/tsconfig.json'],
+        project: ['packages/*/tsconfig.json', 'apps/*/tsconfig.json', 'firebase/tsconfig.json'],
       },
     },
   },
@@ -150,7 +150,9 @@ export default tseslint.config(
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     languageOptions: {
       parserOptions: {
-        projectService: { allowDefaultProject: ['packages/*/vitest.config.ts'] },
+        projectService: {
+          allowDefaultProject: ['packages/*/vitest.config.ts', 'firebase/vitest.config.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
