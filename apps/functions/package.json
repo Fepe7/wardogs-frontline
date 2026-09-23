@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test:integration": "firebase emulators:exec --only firestore --project demo-frontline \"vitest run\""
   },
   "dependencies": {
     "firebase-admin": "^14.4.0",

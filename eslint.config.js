@@ -151,7 +151,11 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['packages/*/vitest.config.ts', 'firebase/vitest.config.ts'],
+          allowDefaultProject: [
+            'packages/*/vitest.config.ts',
+            'firebase/vitest.config.ts',
+            'apps/functions/vitest.config.ts',
+          ],
         },
         tsconfigRootDir: import.meta.dirname,
       },

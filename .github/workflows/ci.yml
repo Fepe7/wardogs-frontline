@@ -61,3 +61,6 @@ jobs:
 
       - name: Security rules
         run: pnpm test:rules
+
+      - name: Firestore integration
+        run: pnpm test:integration
