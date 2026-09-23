@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - packages/*
+# Dependencies allowed to run install scripts (pnpm blocks all others by default).
+allowBuilds:
+  unrs-resolver: true
+  esbuild: true
+  '@parcel/watcher': true
+  lmdb: true
+  msgpackr-extract: true

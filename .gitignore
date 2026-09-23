@@ -1,0 +1,15 @@
+# Dependencias y builds
+node_modules/
+dist/
+lib/
+out/
+coverage/
+.angular/
+
+# Entorno
+.env*
+!.env.example
+
+# Firebase
+.firebase/
+*-debug.log

@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "wardogs-frontline-dev",
+    "dev": "wardogs-frontline-dev",
+    "prod": "wardogs-frontline-prod"
+  }
+}
