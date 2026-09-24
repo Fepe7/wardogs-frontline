@@ -18,7 +18,9 @@
     "build": "pnpm -r --if-present build",
     "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
     "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
-    "seed:demo": "pnpm --filter @frontline/functions seed:demo"
+    "seed:demo": "pnpm --filter @frontline/functions seed:demo",
+    "deploy:dev": "pnpm --filter @frontline/functions build && pnpm --filter @frontline/web build:dev && pnpm --filter @frontline/web verify:dev && firebase deploy --project dev --force --only \"hosting,firestore,functions:onIntegrationEvent,functions:advanceWarJob,functions:simulateWarJob,functions:fastForwardDemo\"",
+    "deploy:dev:web": "pnpm --filter @frontline/web build:dev && pnpm --filter @frontline/web verify:dev && firebase deploy --project dev --only hosting"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
