@@ -28,8 +28,11 @@
 
   /* One signage family in two widths: condensed for board labels, expanded for the header. */
   --font-display: 'Anybody', 'Arial Narrow', sans-serif;
-  /* The flap tiles: a condensed mono with tabular figures and a flagged 1. */
-  --font-data: 'Martian Mono', ui-monospace, monospace;
+  /* The flap tiles: the board's signage face at normal width, with tabular figures.
+     A clean zero (no slash) keeps 0, 6 and 8 apart on small tiles. */
+  --font-data: 'Anybody', 'Arial Narrow', sans-serif;
+  /* Code samples (the proposed JSON messages). */
+  --font-code: ui-monospace, 'Cascadia Mono', Consolas, monospace;
   --font-sans: 'Public Sans', system-ui, sans-serif;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

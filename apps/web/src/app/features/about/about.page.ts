@@ -214,8 +214,7 @@ export const SEASON_RESULT_EXAMPLE = {
     .sheet-body {
       overflow-x: auto;
       padding: 1rem;
-      font-family: var(--font-data);
-      font-stretch: 75%;
+      font-family: var(--font-code);
       font-size: 0.85rem;
       line-height: 1.6;
     }

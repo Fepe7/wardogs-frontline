@@ -61,7 +61,7 @@ type Outcome = 'takes' | 'holds' | 'holdsOnTie';
   styles: `
     .font-data {
       font-family: var(--font-data);
-      font-stretch: 75%;
+      font-stretch: 100%;
     }
   `,
 })
