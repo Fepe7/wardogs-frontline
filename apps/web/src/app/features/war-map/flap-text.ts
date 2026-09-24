@@ -41,13 +41,13 @@ const BLANK_TILE = '\u00a0';
       animation: flap-in 300ms var(--ease-out) both;
       animation-delay: calc(var(--i) * 28ms);
     }
-    /* The hinge gap between the two halves, in the color of the wall behind the board. */
+    /* The hinge between the two halves: a hairline, so it never cuts a character in two. */
     .flap::after {
       content: '';
       position: absolute;
-      inset: calc(50% - 1px) 0 auto;
-      height: 2px;
-      background: var(--color-table);
+      inset: 50% 0 auto;
+      height: 1px;
+      background: rgb(0 0 0 / 0.45);
     }
     @keyframes flap-in {
       from {

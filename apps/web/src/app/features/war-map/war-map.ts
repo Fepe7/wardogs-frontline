@@ -58,7 +58,7 @@ const TWO_TILES = 2;
             </div>
             <section
               aria-labelledby="territory-title"
-              class="border-t border-grid px-4 py-4 sm:px-8 lg:border-b"
+              class="flex-1 border-t border-grid px-4 py-4 sm:px-8"
             >
               <h3 id="territory-title" class="font-display text-lg font-extrabold text-chalk-muted">
                 {{ 'warMap.territory' | transloco }}

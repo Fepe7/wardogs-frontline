@@ -36,7 +36,7 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
       <ul class="mt-2">
         @for (battle of battles(); track battle.id) {
           @let left = timeLeft(battle.endsAt, warNowMs());
-          <li class="relative border-t border-grid py-3">
+          <li class="relative border-t border-grid py-2.5">
             <!-- One element per latest match that scored here: the row lights up amber, once. -->
             @if (flashKey(battle); as key) {
               @for (flash of [key]; track flash) {
@@ -52,7 +52,7 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
             >
               <app-flap-text [text]="sectorNames().get(battle.sectorId) ?? battle.sectorId" />
             </a>
-            <div class="relative mt-2 flex items-center justify-between gap-4">
+            <div class="relative mt-1.5 flex items-center justify-between gap-4">
               <p class="text-xs text-chalk-muted">
                 {{
                   (simulated() ? 'warMap.simulatedMatchesCounted' : 'warMap.matchesCounted')
@@ -63,21 +63,21 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
                 <!-- Time up but not yet resolved (the war advances on a schedule): never show 00:00. -->
                 @if (left.hours === 0 && left.minutes === 0) {
                   <app-flap-text
-                    class="text-sm text-signal"
+                    class="text-base text-signal"
                     [text]="'warMap.closing' | transloco"
                     [label]="'warMap.closingLabel' | transloco"
                   />
                 } @else {
                   <span aria-hidden="true">{{ 'warMap.left' | transloco }}</span>
                   <app-flap-text
-                    class="text-sm text-signal"
+                    class="text-base text-signal"
                     [text]="format(left.hours) + ':' + format(left.minutes)"
                     [label]="'warMap.timeLeft' | transloco: left"
                   />
                 }
               </p>
             </div>
-            <table class="relative mt-2 w-full">
+            <table class="relative mt-1 w-full">
               <caption class="sr-only">
                 {{
                   'warMap.score' | transloco
@@ -100,7 +100,7 @@ export const timeLeft = (endsAt: Date, warNowMs: number) => {
                     </th>
                     <td class="py-0.5 text-right">
                       <app-flap-text
-                        class="text-base"
+                        class="text-lg"
                         [text]="format(side.points)"
                         [label]="'' + side.points"
                       />
