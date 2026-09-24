@@ -16,7 +16,10 @@
   },
   "hosting": {
     "public": "apps/web/dist/web/browser",
-    "predeploy": ["pnpm --filter @frontline/web build:dev"],
+    "predeploy": [
+      "pnpm --filter @frontline/web build:dev",
+      "pnpm --filter @frontline/web verify:dev"
+    ],
     "ignore": ["**/.*"],
     "cleanUrls": true,
     "trailingSlash": false,
