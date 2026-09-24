@@ -21,7 +21,8 @@ export const RATE_LIMITS: Readonly<
   submitReport: { action: 'submitReport', max: 10, windowMs: 24 * HOUR_MS },
   castVote: { action: 'castVote', max: 30, windowMs: HOUR_MS },
   /** Global, not per player: anyone watching the demo can press the button. */
-  fastForwardDemo: { action: 'fastForwardDemo', max: 20, windowMs: HOUR_MS },
+  // Shared by every visitor: high enough to demo freely, low enough to cap a loop (~0.6 $/day worst case).
+  fastForwardDemo: { action: 'fastForwardDemo', max: 120, windowMs: HOUR_MS },
 };
 
 /** Screenshots must live in the caller's own folder; storage.rules will enforce the same path when uploads open. */
