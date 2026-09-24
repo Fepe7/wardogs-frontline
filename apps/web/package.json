@@ -9,7 +9,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
-    "serve:ssr": "node dist/web/server/server.mjs"
+    "serve:ssr": "node dist/web/server/server.mjs",
+    "build:dev": "ng build --configuration dev"
   },
   "dependencies": {
     "@angular/common": "^22.1.0",

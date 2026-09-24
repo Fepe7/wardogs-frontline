@@ -9,6 +9,9 @@ coverage/
 # Entorno
 .env*
 !.env.example
+# Function parameters per project (no secrets: those live in Secret Manager).
+!apps/functions/.env.demo-frontline
+!apps/functions/.env.wardogs-frontline-*
 
 # Firebase
 .firebase/

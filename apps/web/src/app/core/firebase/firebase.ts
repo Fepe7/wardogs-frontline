@@ -60,10 +60,26 @@ export class FirebaseClient {
   }
 
   private firebaseApp(): Promise<FirebaseApp> {
-    this.app ??= import('firebase/app').then(({ initializeApp }) =>
-      initializeApp(environment.firebase),
-    );
+    this.app ??= import('firebase/app').then(async ({ initializeApp }) => {
+      const app = initializeApp(environment.firebase);
+      await this.protectWithAppCheck(app);
+      return app;
+    });
     return this.app;
+  }
+
+  /**
+   * App Check proves requests come from this web app: the callables reject anything else.
+   * Off against the emulators (no site key there) and during the server render.
+   */
+  private async protectWithAppCheck(app: FirebaseApp): Promise<void> {
+    const siteKey = environment.appCheckSiteKey;
+    if (!siteKey || !this.isBrowser) return;
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import('firebase/app-check');
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(siteKey),
+      isTokenAutoRefreshEnabled: true,
+    });
   }
 }
 
