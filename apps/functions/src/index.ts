@@ -141,7 +141,7 @@ export const fastForwardDemo = onCall(callableOptions, (request) =>
   fastForwardDemoCallable({
     demoMode: demoMode.value(),
     rateLimiter,
-    rateLimit: RATE_LIMITS.fastForwardDemo,
+    rateLimits: [RATE_LIMITS.fastForwardDemo, RATE_LIMITS.fastForwardDemoDaily],
     run: fastForwardDemoRun({
       db,
       clock: systemClock,

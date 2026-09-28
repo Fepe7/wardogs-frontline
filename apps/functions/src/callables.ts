@@ -16,13 +16,14 @@ const HOUR_MS = 60 * 60 * 1000;
 
 /** Anti-abuse limits per player (docs/DISEÑO.md §5). */
 export const RATE_LIMITS: Readonly<
-  Record<'submitReport' | 'castVote' | 'fastForwardDemo', RateLimitRule>
+  Record<'submitReport' | 'castVote' | 'fastForwardDemo' | 'fastForwardDemoDaily', RateLimitRule>
 > = {
   submitReport: { action: 'submitReport', max: 10, windowMs: 24 * HOUR_MS },
   castVote: { action: 'castVote', max: 30, windowMs: HOUR_MS },
   /** Global, not per player: anyone watching the demo can press the button. */
-  // Shared by every visitor: high enough to demo freely, low enough to cap a loop (~0.6 $/day worst case).
-  fastForwardDemo: { action: 'fastForwardDemo', max: 120, windowMs: HOUR_MS },
+  // Shared by every visitor: the hourly cap stops bursts, the daily one caps the cost of a public link.
+  fastForwardDemo: { action: 'fastForwardDemo', max: 30, windowMs: HOUR_MS },
+  fastForwardDemoDaily: { action: 'fastForwardDemoDaily', max: 200, windowMs: 24 * HOUR_MS },
 };
 
 /** Screenshots must live in the caller's own folder; storage.rules will enforce the same path when uploads open. */

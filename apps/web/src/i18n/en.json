@@ -11,7 +11,7 @@
     "fastForward": "Skip 1 hour",
     "fastForwarding": "Skipping an hour…",
     "fastForwarded": "One hour later: {{matches}} matches played, {{closedRounds}} votes closed and {{resolvedBattles}} battles over.",
-    "rate-limited": "The demo has been skipped ahead a lot this hour. Try again later.",
+    "rate-limited": "The demo has been skipped ahead a lot lately. Try again later.",
     "failed": "The war could not be skipped ahead. Try again in a moment."
   },
   "footer": {

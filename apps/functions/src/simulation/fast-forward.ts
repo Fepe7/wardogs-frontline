@@ -53,7 +53,8 @@ export const fastForwardDemoCallable =
   (deps: {
     demoMode: boolean;
     rateLimiter: RateLimiter;
-    rateLimit: RateLimitRule;
+    /** Every rule must allow the press; the tightest goes first so it fails before spending the rest. */
+    rateLimits: readonly RateLimitRule[];
     run: () => Promise<FastForwardDemoResponse>;
   }) =>
   async (request: CallableInput): Promise<FastForwardDemoResponse> => {
@@ -61,8 +62,10 @@ export const fastForwardDemoCallable =
       return fail('invalid-argument', 'invalid-request');
     }
     if (!deps.demoMode) return fail('failed-precondition', 'demo-only');
-    if (!(await deps.rateLimiter.consume('demo' as PlayerId, deps.rateLimit))) {
-      return fail('resource-exhausted', 'rate-limited');
+    for (const rule of deps.rateLimits) {
+      if (!(await deps.rateLimiter.consume('demo' as PlayerId, rule))) {
+        return fail('resource-exhausted', 'rate-limited');
+      }
     }
     return deps.run();
   };
