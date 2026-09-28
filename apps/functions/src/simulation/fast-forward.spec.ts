@@ -30,17 +30,21 @@ const warNow = async () => {
   return { clock, useCases: composeUseCases(db, clock, pace) };
 };
 
-const callable = (demoMode: boolean, max = 2) =>
+const callable = (demoMode: boolean, hourlyMax = 2, dailyMax = 10) =>
   fastForwardDemoCallable({
     demoMode,
     rateLimiter: firestoreRateLimiter(db, realClock),
-    rateLimit: { ...RATE_LIMITS.fastForwardDemo, max },
+    rateLimits: [
+      { ...RATE_LIMITS.fastForwardDemo, max: hourlyMax },
+      { ...RATE_LIMITS.fastForwardDemoDaily, max: dailyMax },
+    ],
     run: press,
   });
-const call = (demoMode: boolean, max?: number) =>
+const call = (demoMode: boolean, hourlyMax?: number, dailyMax?: number) =>
   callable(
     demoMode,
-    max,
+    hourlyMax,
+    dailyMax,
   )({ auth: undefined, data: {} }).then(
     () => 'ok',
     (error: unknown) => (error as { details: { reason: string } }).details.reason,
@@ -109,5 +113,11 @@ describe('fast-forwarding the demo war', () => {
     expect(await call(true, 2)).toBe('ok');
     expect(await call(true, 2)).toBe('ok');
     expect(await call(true, 2)).toBe('rate-limited');
+  });
+
+  it('also stops for the rest of the day once the daily cap is spent, to cap the cost', async () => {
+    expect(await call(true, 10, 1)).toBe('ok');
+    expect(await call(true, 10, 1)).toBe('rate-limited');
+    expect(await readDemoOffset(db)).toBe(HOUR_MS);
   });
 });
